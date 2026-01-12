@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-};
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  // Optimize production build
+  compress: true,
+  // Enable React strict mode
+  reactStrictMode: true,
+}
 
-export default nextConfig;
+export default nextConfig
