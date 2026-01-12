@@ -21,7 +21,7 @@ export default function Contact() {
   ]
 
   return (
-    <section id="contact" className="min-h-screen flex items-center py-24 bg-gradient-to-br from-[#2D5F5D] to-[#4FA39A] relative overflow-hidden">
+    <section id="contact" className="min-h-screen flex items-center py-24 bg-gradient-to-r from-[#2D5F5D] to-[#4FA39A] relative overflow-hidden">
       {/* Background Decoration */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%),radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
 

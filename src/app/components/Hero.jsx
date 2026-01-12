@@ -11,7 +11,7 @@ export default function Hero() {
   return (
     <section 
       id="home"
-      className="relative min-h-screen flex items-center bg-gradient-to-br from-[#2D5F5D] via-[#4FA39A] to-[#5AB5B8] pt-20 pb-16 overflow-hidden"
+      className="relative min-h-screen flex items-center bg-gradient-to-r from-[#2D5F5D] via-[#4FA39A] to-[#5AB5B8] pt-20 pb-16 overflow-hidden"
     >
       {/* Decorative Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.1)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />

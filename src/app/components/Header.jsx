@@ -70,7 +70,7 @@ export default function Header() {
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+              className="px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
             >
               View Rates
             </button>

@@ -38,7 +38,7 @@ export default function Features() {
               key={index}
               className="bg-white rounded-3xl p-10 text-center transition-all hover:-translate-y-2 hover:shadow-xl border-2 border-transparent hover:border-[#4FA39A]"
             >
-              <div className="w-20 h-20 bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-bold text-[#2D5F5D] mb-3">

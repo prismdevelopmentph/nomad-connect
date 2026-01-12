@@ -64,7 +64,7 @@ export default function Pricing() {
   return (
     <section id="pricing" className="min-h-screen flex items-center py-24 bg-white relative overflow-hidden">
       {/* Background Decoration */}
-      <div className="absolute top-0 left-0 right-0 h-80 bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] opacity-5" />
+      <div className="absolute top-0 left-0 right-0 h-80 bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] opacity-5" />
 
       <div className="container mx-auto px-6 max-w-[1400px] relative z-10">
         <h2 className="text-4xl md:text-5xl font-bold text-[#2D5F5D] mb-4 text-center leading-tight">
@@ -85,12 +85,12 @@ export default function Pricing() {
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] text-white px-6 py-2 rounded-full text-xs font-bold tracking-wider">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] text-white px-6 py-2 rounded-full text-xs font-bold tracking-wider">
                   {plan.badge}
                 </div>
               )}
 
-              <div className="w-[70px] h-[70px] bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">
+              <div className="w-[70px] h-[70px] bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">
                 {plan.icon}
               </div>
 
@@ -117,7 +117,7 @@ export default function Pricing() {
 
               <button
                 onClick={() => handleBooking(plan)}
-                className="w-full px-6 py-4 rounded-full font-semibold text-white bg-gradient-to-br from-[#4FA39A] to-[#5AB5B8] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                className="w-full px-6 py-4 rounded-full font-semibold text-white bg-gradient-to-r from-[#4FA39A] to-[#5AB5B8] shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
               >
                 Book {plan.title.split(' ')[0]}
               </button>
@@ -126,7 +126,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center mt-10 text-[#5A6B6C] text-xs italic">
-          *Security deposit required. Delivery charges may apply within Metro Manila.
+          *Security deposit required. Delivery charges may apply outside Metro Manila.
         </p>
       </div>
     </section>
