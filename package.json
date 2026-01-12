@@ -1,0 +1,21 @@
+{
+  "name": "nomad-connect",
+  "version": "1.0.0",
+  "description": "Starlink Satellite Rental Service in the Philippines",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "build": "echo No build needed",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "starlink",
+    "satellite",
+    "internet",
+    "rental",
+    "philippines"
+  ],
+  "author": "Nomad Connect",
+  "license": "MIT"
+}
