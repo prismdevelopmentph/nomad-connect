@@ -184,7 +184,7 @@ function renderBookingsTable() {
     if (filteredBookings.length === 0) {
         bookingsTableContainer.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-icon">🔭</div>
                 <h3>No bookings found</h3>
                 <p>No ${currentFilter === 'all' ? '' : currentFilter} bookings at the moment.</p>
             </div>
@@ -224,7 +224,7 @@ function renderBookingsTable() {
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn view-btn" onclick="viewBooking('${booking.id}')">View Details</button>
-                                    ${booking.payment_method === 'gcash' && booking.payment_proof_url ? `
+                                    ${(booking.payment_method === 'gcash' || booking.payment_method === 'bank') && booking.payment_proof_url ? `
                                         <button class="action-btn" 
                                                 style="background: #00BFA5; color: white;" 
                                                 onclick="window.open('${booking.payment_proof_url}', '_blank')">
@@ -289,8 +289,12 @@ function viewBooking(bookingId) {
             <span class="detail-value"><strong>₱${parseFloat(booking.total_price).toLocaleString('en-PH')}</strong></span>
         </div>
         <div class="detail-row">
+            <span class="detail-label">Down Payment (50%):</span>
+            <span class="detail-value"><strong>₱${parseFloat(booking.down_payment || booking.total_price * 0.5).toLocaleString('en-PH')}</strong></span>
+        </div>
+        <div class="detail-row">
             <span class="detail-label">Payment Method:</span>
-            <span class="detail-value">${booking.payment_method === 'gcash' ? 'GCash' : 'Direct Payment'}</span>
+            <span class="detail-value">${booking.payment_method === 'gcash' ? 'GCash' : booking.payment_method === 'bank' ? 'Bank Transfer' : 'Direct Payment'}</span>
         </div>
         ${booking.special_requests ? `
             <div class="detail-row">
@@ -303,22 +307,22 @@ function viewBooking(bookingId) {
             <span class="detail-value">${formatDateTime(booking.created_at)}</span>
         </div>
         
-        <!-- PAYMENT PROOF SECTION - NEW -->
-        ${booking.payment_method === 'gcash' ? `
-            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--sand);">
-                <h3 style="color: var(--dark-teal); margin-bottom: 16px; font-size: 18px;">Payment Proof</h3>
+        <!-- PAYMENT PROOF SECTION -->
+        ${(booking.payment_method === 'gcash' || booking.payment_method === 'bank') ? `
+            <div class="payment-proof-section">
+                <h3>Payment Proof (50% Reservation Fee)</h3>
                 ${booking.payment_proof_url ? `
                     <div style="text-align: center;">
                         <img src="${booking.payment_proof_url}" 
                              alt="Payment Proof" 
-                             style="max-width: 100%; max-height: 400px; border-radius: 12px; border: 2px solid var(--sand); cursor: pointer;"
+                             class="payment-proof-image"
                              onclick="window.open('${booking.payment_proof_url}', '_blank')">
-                        <p style="margin-top: 12px; color: var(--text-light); font-size: 12px;">
+                        <p class="payment-proof-note">
                             Click image to view full size
                         </p>
                     </div>
                 ` : `
-                    <p style="color: var(--text-light); text-align: center;">No payment proof uploaded</p>
+                    <p class="no-payment-proof">No payment proof uploaded</p>
                 `}
             </div>
         ` : ''}
