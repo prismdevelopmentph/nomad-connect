@@ -669,3 +669,84 @@ body {
 .form-section ul li strong {
     color: var(--dark-teal);
 }
+
+/* Calendar Styles */
+#booking-calendar {
+    font-family: inherit;
+}
+
+#booking-calendar .fc {
+    border: none;
+}
+
+#booking-calendar .fc-header-toolbar {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--sand);
+}
+
+#booking-calendar .fc-button {
+    background: var(--primary-teal) !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    text-transform: capitalize !important;
+    font-weight: 600 !important;
+}
+
+#booking-calendar .fc-button:hover {
+    background: var(--dark-teal) !important;
+}
+
+#booking-calendar .fc-button-active {
+    background: var(--dark-teal) !important;
+}
+
+#booking-calendar .fc-daygrid-day {
+    cursor: pointer;
+}
+
+#booking-calendar .fc-daygrid-day:hover {
+    background: rgba(79, 163, 154, 0.1);
+}
+
+#booking-calendar .fc-day-past {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Available dates - green */
+#booking-calendar .fc-daygrid-day.available {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+/* Blocked dates - red */
+#booking-calendar .fc-daygrid-day.blocked {
+    background: rgba(244, 67, 54, 0.15);
+    cursor: not-allowed !important;
+}
+
+/* Selected dates - teal */
+#booking-calendar .fc-daygrid-day.selected {
+    background: var(--primary-teal) !important;
+    color: white;
+}
+
+#booking-calendar .fc-daygrid-day.selected .fc-daygrid-day-number {
+    color: white;
+    font-weight: bold;
+}
+
+#booking-calendar .fc-day-today {
+    background: rgba(79, 163, 154, 0.05) !important;
+}
+
+#booking-calendar .fc-day-today .fc-daygrid-day-number {
+    background: var(--primary-teal);
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

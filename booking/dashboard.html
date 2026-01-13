@@ -6,8 +6,8 @@
     <title>My Dashboard - Nomad Connect</title>
     <link rel="icon" type="image/png" href="../images/logo.png">
     <link rel="stylesheet" href="dashboard.css">
-    <!-- Flatpickr for date picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
 </head>
 <body>
     <!-- Header -->
@@ -77,17 +77,37 @@
                         <span style="color: var(--text-light); font-size: 14px;">50% down payment required to confirm reservation</span>
                     </p>
                     
+                    <!-- Calendar Legend -->
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #4CAF50; border-radius: 4px;"></div>
+                            <span style="font-size: 14px; color: var(--text-dark);">Available</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #F44336; border-radius: 4px;"></div>
+                            <span style="font-size: 14px; color: var(--text-dark);">Booked</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #4FA39A; border-radius: 4px;"></div>
+                            <span style="font-size: 14px; color: var(--text-dark);">Selected</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Visual Calendar -->
+                    <div id="booking-calendar" style="margin-bottom: 24px; background: white; padding: 16px; border-radius: 12px; border: 2px solid var(--sand);"></div>
+                    
+                    <!-- Date Inputs (Hidden but still functional) -->
                     <div class="date-inputs">
                         <div class="form-group">
                             <label for="start-date">Start Date</label>
-                            <input type="text" id="start-date" placeholder="Select start date" required readonly>
+                            <input type="text" id="start-date" placeholder="Click calendar to select" required readonly>
                         </div>
                         <div class="form-group">
                             <label for="end-date">End Date</label>
-                            <input type="text" id="end-date" placeholder="Select end date" required readonly>
+                            <input type="text" id="end-date" placeholder="Click calendar to select" required readonly>
                         </div>
                     </div>
-                    <p class="date-note">Select available dates for your rental period</p>
+                    <p class="date-note" id="calendar-note">Click on the calendar to select your rental dates</p>
                 </div>
 
                 <!-- Delivery Details -->
@@ -200,7 +220,7 @@
                 <div id="form-error" class="error-message"></div>
                 <button type="submit" class="btn btn-primary btn-full">Submit Booking</button>
             </form>
-            
+
     <!-- Booking Detail Modal -->
     <div id="detail-modal" class="modal">
         <div class="modal-content">
@@ -211,6 +231,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="dashboard.js"></script>
 </body>
 </html>

@@ -5,6 +5,9 @@ let userBookings = [];
 let blockedDates = [];
 let startDatePicker = null;
 let endDatePicker = null;
+let calendar = null;
+let selectedStartDate = null;
+let selectedEndDate = null;
 
 // DOM Elements
 const welcomeName = document.getElementById('welcome-name');
@@ -214,16 +217,22 @@ async function loadBlockedDates() {
     }
 }
 
-// Date Picker Functions
+// Date Picker Functions - REPLACE THIS ENTIRE SECTION
 function initializeDatePickers() {
+    // Initialize visual calendar
+    initializeCalendar();
+    
+    // Keep flatpickr for fallback/mobile
     startDatePicker = flatpickr('#start-date', {
         minDate: 'today',
         dateFormat: 'Y-m-d',
         disable: blockedDates,
         onChange: function(selectedDates, dateStr) {
+            selectedStartDate = dateStr;
             if (endDatePicker) {
                 endDatePicker.set('minDate', dateStr);
             }
+            updateCalendarSelection();
             updateSummary();
         }
     });
@@ -232,8 +241,143 @@ function initializeDatePickers() {
         minDate: 'today',
         dateFormat: 'Y-m-d',
         disable: blockedDates,
-        onChange: updateSummary
+        onChange: function(selectedDates, dateStr) {
+            selectedEndDate = dateStr;
+            updateCalendarSelection();
+            updateSummary();
+        }
     });
+}
+
+function initializeCalendar() {
+    const calendarEl = document.getElementById('booking-calendar');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+        },
+        height: 'auto',
+        selectable: true,
+        selectMirror: true,
+        validRange: {
+            start: new Date() // Disable past dates
+        },
+        
+        // Handle date selection
+        dateClick: function(info) {
+            const clickedDate = info.dateStr;
+            
+            // Check if date is blocked
+            if (blockedDates.includes(clickedDate)) {
+                alert('This date is already booked. Please select another date.');
+                return;
+            }
+            
+            // Check if date is in the past
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const clicked = new Date(clickedDate);
+            
+            if (clicked < today) {
+                alert('Cannot select past dates.');
+                return;
+            }
+            
+            // Date selection logic
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                // Start new selection
+                selectedStartDate = clickedDate;
+                selectedEndDate = null;
+                document.getElementById('start-date').value = clickedDate;
+                document.getElementById('end-date').value = '';
+                document.getElementById('calendar-note').textContent = 'Now select your end date';
+            } else if (selectedStartDate && !selectedEndDate) {
+                // Set end date
+                const start = new Date(selectedStartDate);
+                const end = new Date(clickedDate);
+                
+                if (end < start) {
+                    alert('End date must be after start date.');
+                    return;
+                }
+                
+                // Check if any dates in range are blocked
+                const datesInRange = getDatesInRange(selectedStartDate, clickedDate);
+                const hasBlockedDate = datesInRange.some(date => blockedDates.includes(date));
+                
+                if (hasBlockedDate) {
+                    alert('Some dates in your selected range are already booked. Please choose different dates.');
+                    return;
+                }
+                
+                selectedEndDate = clickedDate;
+                document.getElementById('end-date').value = clickedDate;
+                document.getElementById('calendar-note').textContent = 'Dates selected! You can click again to change.';
+            }
+            
+            updateCalendarSelection();
+            updateSummary();
+        },
+        
+        // Customize day rendering
+        dayCellDidMount: function(info) {
+            const dateStr = info.date.toISOString().split('T')[0];
+            
+            // Mark blocked dates
+            if (blockedDates.includes(dateStr)) {
+                info.el.classList.add('blocked');
+            } else {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (info.date >= today) {
+                    info.el.classList.add('available');
+                }
+            }
+        }
+    });
+    
+    calendar.render();
+    updateCalendarSelection();
+}
+
+function updateCalendarSelection() {
+    if (!calendar) return;
+    
+    // Remove all selected classes
+    document.querySelectorAll('.fc-daygrid-day').forEach(el => {
+        el.classList.remove('selected');
+    });
+    
+    // Add selected class to selected range
+    if (selectedStartDate && selectedEndDate) {
+        const dates = getDatesInRange(selectedStartDate, selectedEndDate);
+        dates.forEach(dateStr => {
+            const dayEl = document.querySelector(`[data-date="${dateStr}"]`);
+            if (dayEl) {
+                dayEl.classList.add('selected');
+            }
+        });
+    } else if (selectedStartDate) {
+        const dayEl = document.querySelector(`[data-date="${selectedStartDate}"]`);
+        if (dayEl) {
+            dayEl.classList.add('selected');
+        }
+    }
+}
+
+function getDatesInRange(startDate, endDate) {
+    const dates = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+        dates.push(date.toISOString().split('T')[0]);
+    }
+    
+    return dates;
 }
 
 // Booking Modal Functions
@@ -242,6 +386,16 @@ function openBookingModal() {
     bookingForm.reset();
     formError.classList.remove('show');
     document.getElementById('image-preview').innerHTML = '';
+    
+    // Reset calendar selection
+    selectedStartDate = null;
+    selectedEndDate = null;
+    document.getElementById('calendar-note').textContent = 'Click on the calendar to select your rental dates';
+    
+    if (calendar) {
+        updateCalendarSelection();
+    }
+    
     updateSummary();
 }
 
