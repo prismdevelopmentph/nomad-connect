@@ -55,11 +55,14 @@ async function checkAuth() {
         try {
             const sessionData = JSON.parse(session);
             currentUser = sessionData;
+            
+            // Validate token by attempting to load bookings
             showDashboard();
-            loadBookings();
+            await loadBookings();
         } catch (error) {
             console.error('Invalid session', error);
             localStorage.removeItem('admin_session');
+            showLogin();
         }
     }
 }
@@ -141,6 +144,13 @@ async function loadBookings() {
         const data = await response.json();
         
         if (!response.ok) {
+            // Handle authentication errors
+            if (response.status === 401) {
+                console.error('Authentication failed - logging out');
+                alert('Your session has expired. Please login again.');
+                handleLogout();
+                return;
+            }
             throw new Error(data.error || 'Failed to load bookings');
         }
         
@@ -369,6 +379,12 @@ async function updateBookingStatus(bookingId, newStatus) {
         const data = await response.json();
         
         if (!response.ok) {
+            // Handle authentication errors
+            if (response.status === 401) {
+                alert('Your session has expired. Please login again.');
+                handleLogout();
+                return;
+            }
             throw new Error(data.error || 'Failed to update booking');
         }
         

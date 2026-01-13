@@ -25,31 +25,42 @@ module.exports = async (req, res) => {
         // Fetch all confirmed bookings
         const { data: bookings, error: bookingsError } = await supabase
             .from('bookings')
-            .select('start_date, end_date')
+            .select('start_date, end_date, booking_reference')
             .eq('status', 'confirmed');
 
         if (bookingsError) {
             throw new Error(bookingsError.message);
         }
 
+        console.log('Confirmed bookings:', bookings); // Debug log
+
         // Convert booking date ranges to array of blocked dates
-        const blockedDates = [];
+        const blockedDatesSet = new Set();
         
         bookings.forEach(booking => {
-            const start = new Date(booking.start_date);
-            const end = new Date(booking.end_date);
+            const start = new Date(booking.start_date + 'T00:00:00');
+            const end = new Date(booking.end_date + 'T00:00:00');
             
-            // Add all dates in the range
-            for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-                const dateStr = date.toISOString().split('T')[0];
-                if (!blockedDates.includes(dateStr)) {
-                    blockedDates.push(dateStr);
-                }
+            console.log(`Processing booking ${booking.booking_reference}: ${booking.start_date} to ${booking.end_date}`); // Debug log
+            
+            // Add all dates in the range (inclusive)
+            const currentDate = new Date(start);
+            while (currentDate <= end) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                blockedDatesSet.add(dateStr);
+                console.log(`  Blocking date: ${dateStr}`); // Debug log
+                currentDate.setDate(currentDate.getDate() + 1);
             }
         });
 
+        const blockedDates = Array.from(blockedDatesSet).sort();
+        
+        console.log('Total blocked dates:', blockedDates.length); // Debug log
+        console.log('Blocked dates array:', blockedDates); // Debug log
+
         return res.status(200).json({
-            blocked_dates: blockedDates
+            blocked_dates: blockedDates,
+            total_confirmed_bookings: bookings.length
         });
 
     } catch (error) {
