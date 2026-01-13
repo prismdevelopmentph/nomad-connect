@@ -235,43 +235,10 @@ function initializeCalendar() {
             center: 'title',
             right: ''
         },
-        selectable: true,
-        selectMirror: true,
+        selectable: false, // Disable drag selection - use click only
+        selectMirror: false,
         validRange: {
             start: new Date().toISOString().split('T')[0]
-        },
-        
-        // Handle date selection
-        select: function(info) {
-            const startDate = info.startStr;
-            const endDate = new Date(info.end);
-            endDate.setDate(endDate.getDate() - 1); // Adjust for FullCalendar's exclusive end
-            const endDateStr = endDate.toISOString().split('T')[0];
-            
-            // Check if any date in range is blocked
-            const selectedDates = getDatesInRange(startDate, endDateStr);
-            const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
-            
-            if (hasBlockedDate) {
-                alert('One or more selected dates are already booked. Please choose different dates.');
-                calendar.unselect();
-                return;
-            }
-            
-            // Update selected dates
-            selectedStartDate = startDate;
-            selectedEndDate = endDateStr;
-            
-            // Update input fields
-            document.getElementById('start-date').value = startDate;
-            document.getElementById('end-date').value = endDateStr;
-            
-            // Update note
-            document.getElementById('calendar-note').textContent = 
-                `Selected: ${formatDate(startDate)} to ${formatDate(endDateStr)}`;
-            
-            updateCalendarSelection();
-            updateSummary();
         },
         
         // Handle single date click
