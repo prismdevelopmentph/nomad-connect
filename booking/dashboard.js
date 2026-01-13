@@ -200,9 +200,13 @@ async function loadBlockedDates() {
         
         if (response.ok && data.blocked_dates) {
             blockedDates = data.blocked_dates;
+            console.log('✅ Loaded blocked dates:', blockedDates);
+            console.log('📊 Total confirmed bookings:', data.total_confirmed_bookings);
+        } else {
+            console.error('❌ Failed to load blocked dates:', data);
         }
     } catch (error) {
-        console.error('Error loading blocked dates:', error);
+        console.error('❌ Error loading blocked dates:', error);
     }
 }
 
@@ -230,6 +234,10 @@ function initializeCalendar() {
         
         dateClick: function(info) {
             const clickedDate = info.dateStr;
+            
+            console.log('🖱️ Clicked date:', clickedDate);
+            console.log('🚫 Blocked dates:', blockedDates);
+            console.log('❓ Is blocked?', blockedDates.includes(clickedDate));
             
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -366,7 +374,7 @@ function getDatesInRange(startDate, endDate) {
     return dates;
 }
 
-function openBookingModal() {
+async function openBookingModal() {
     bookingModal.classList.add('show');
     bookingForm.reset();
     formError.classList.remove('show');
@@ -378,10 +386,14 @@ function openBookingModal() {
     isSelectingDates = false;
     document.getElementById('start-date').value = '';
     document.getElementById('end-date').value = '';
-    document.getElementById('calendar-note').textContent = 'Click on the calendar to select your rental dates';
+    document.getElementById('calendar-note').textContent = 'Loading available dates...';
+    
+    // Reload blocked dates to get fresh data
+    await loadBlockedDates();
     
     setTimeout(() => {
         initializeCalendar();
+        document.getElementById('calendar-note').textContent = 'Click on the calendar to select your rental dates';
     }, 100);
     
     updateSummary();
