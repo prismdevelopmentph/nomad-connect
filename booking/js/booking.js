@@ -1,25 +1,6 @@
-// Wait for ENV to load, then initialize
-let supabase, EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_USER, EMAILJS_TEMPLATE_ADMIN;
-
-function initializeServices() {
-    // Supabase Configuration (use ENV if available, otherwise hardcoded)
-    const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-    const SUPABASE_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // EmailJS Configuration
-    EMAILJS_PUBLIC_KEY = window.ENV?.EMAILJS_PUBLIC_KEY || 'YOUR_EMAILJS_PUBLIC_KEY';
-    EMAILJS_SERVICE_ID = window.ENV?.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
-    EMAILJS_TEMPLATE_USER = window.ENV?.EMAILJS_TEMPLATE_USER || 'YOUR_USER_TEMPLATE_ID';
-    EMAILJS_TEMPLATE_ADMIN = window.ENV?.EMAILJS_TEMPLATE_ADMIN || 'YOUR_ADMIN_TEMPLATE_ID';
-
-    // Initialize EmailJS
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-}
-
-// Global state
+// Global configuration and state
+let CONFIG = null;
+let supabase = null;
 let currentUser = null;
 let currentMonth = new Date();
 let selectedStartDate = null;
@@ -34,15 +15,63 @@ const pricing = {
     monthly: 28000
 };
 
+// Load configuration from serverless function
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config.js');
+        CONFIG = await response.json();
+        return true;
+    } catch (error) {
+        console.error('Failed to load config:', error);
+        // Fallback to hardcoded values if API fails
+        CONFIG = {
+            supabase: {
+                url: 'YOUR_SUPABASE_URL',
+                anonKey: 'YOUR_SUPABASE_ANON_KEY'
+            },
+            emailjs: {
+                publicKey: 'YOUR_EMAILJS_PUBLIC_KEY',
+                serviceId: 'YOUR_SERVICE_ID',
+                templates: {
+                    user: 'YOUR_USER_TEMPLATE_ID',
+                    admin: 'YOUR_ADMIN_TEMPLATE_ID',
+                    approved: 'YOUR_APPROVED_TEMPLATE_ID',
+                    rejected: 'YOUR_REJECTED_TEMPLATE_ID'
+                }
+            }
+        };
+        return false;
+    }
+}
+
+// Initialize services after config is loaded
+function initializeServices() {
+    // Initialize Supabase
+    if (window.supabase && CONFIG.supabase.url) {
+        supabase = window.supabase.createClient(
+            CONFIG.supabase.url, 
+            CONFIG.supabase.anonKey
+        );
+    }
+    
+    // Initialize EmailJS
+    if (window.emailjs && CONFIG.emailjs.publicKey) {
+        emailjs.init(CONFIG.emailjs.publicKey);
+    }
+}
+
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for env.js to load, then initialize
-    setTimeout(() => {
-        initializeServices();
-        checkUserSession();
-        setupEventListeners();
-        checkUrlHash(); // Check if user came from a specific link
-    }, 100);
+document.addEventListener('DOMContentLoaded', async function() {
+    // Load config first
+    await loadConfig();
+    
+    // Then initialize services
+    initializeServices();
+    
+    // Then start the app
+    checkUserSession();
+    setupEventListeners();
+    checkUrlHash();
 });
 
 // Check URL hash for direct navigation
@@ -62,7 +91,6 @@ async function checkUserSession() {
         currentUser = JSON.parse(userData);
         showDashboard();
     } else {
-        // Check hash before showing default login
         const hash = window.location.hash;
         if (hash === '#register') {
             showRegister();
@@ -78,25 +106,21 @@ function setupEventListeners() {
     document.getElementById('show-register').addEventListener('click', (e) => {
         e.preventDefault();
         showRegister();
-        window.location.hash = 'register';
     });
     
     document.getElementById('show-login').addEventListener('click', (e) => {
         e.preventDefault();
         showLogin();
-        window.location.hash = 'login';
     });
     
     document.getElementById('login-btn').addEventListener('click', (e) => {
         e.preventDefault();
         showLogin();
-        window.location.hash = 'login';
     });
     
     document.getElementById('register-btn').addEventListener('click', (e) => {
         e.preventDefault();
         showRegister();
-        window.location.hash = 'register';
     });
     
     // Forms
@@ -548,7 +572,7 @@ async function handleBooking(e) {
 async function sendBookingEmails(booking) {
     try {
         // Email to user
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_USER, {
+        await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templates.user, {
             to_email: currentUser.email,
             to_name: currentUser.name,
             booking_id: booking.id,
@@ -559,7 +583,7 @@ async function sendBookingEmails(booking) {
         });
         
         // Email to admin
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
+        await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templates.admin, {
             to_email: 'admin@nomadconnect.ph',
             customer_name: currentUser.name,
             customer_email: currentUser.email,
