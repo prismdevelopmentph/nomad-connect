@@ -292,42 +292,40 @@ function initializeCalendar() {
                 return;
             }
             
-            // If no start date or both dates selected, start new selection
-            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+            // First click or reset - select start date
+            if (!selectedStartDate) {
                 selectedStartDate = clickedDate;
                 selectedEndDate = null;
+                isSelectingDates = true;
+                
                 document.getElementById('start-date').value = clickedDate;
                 document.getElementById('end-date').value = '';
                 document.getElementById('calendar-note').textContent = 
-                    'Now click on your end date';
+                    `Start: ${formatDate(clickedDate)} - Now click your end date`;
                 
                 updateCalendarSelection();
                 updateSummary();
+                return;
             }
-            // If start date exists but no end date
-            else if (selectedStartDate && !selectedEndDate) {
+            
+            // Second click - select end date
+            if (selectedStartDate && !selectedEndDate && isSelectingDates) {
                 // Ensure end date is after or equal to start date
                 if (clickedDate < selectedStartDate) {
-                    // Swap dates - make clicked date the new start
-                    selectedEndDate = selectedStartDate;
-                    selectedStartDate = clickedDate;
-                    document.getElementById('start-date').value = clickedDate;
-                    document.getElementById('end-date').value = selectedEndDate;
-                } else {
-                    // Normal case - clicked date becomes end date
-                    selectedEndDate = clickedDate;
-                    document.getElementById('end-date').value = clickedDate;
+                    alert('End date must be on or after the start date. Please choose a later date.');
+                    return;
                 }
                 
                 // Check if range has blocked dates
-                const selectedDates = getDatesInRange(selectedStartDate, selectedEndDate);
+                const selectedDates = getDatesInRange(selectedStartDate, clickedDate);
                 const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
                 
                 if (hasBlockedDate) {
                     alert('One or more dates in this range are already booked. Please choose different dates.');
-                    // Reset selection
+                    // Reset and start over
                     selectedStartDate = null;
                     selectedEndDate = null;
+                    isSelectingDates = false;
                     document.getElementById('start-date').value = '';
                     document.getElementById('end-date').value = '';
                     document.getElementById('calendar-note').textContent = 
@@ -337,11 +335,33 @@ function initializeCalendar() {
                     return;
                 }
                 
+                // Successfully selected end date
+                selectedEndDate = clickedDate;
+                isSelectingDates = false;
+                
+                document.getElementById('end-date').value = clickedDate;
                 document.getElementById('calendar-note').textContent = 
-                    `Selected: ${formatDate(selectedStartDate)} to ${formatDate(selectedEndDate)}`;
+                    `Selected: ${formatDate(selectedStartDate)} to ${formatDate(clickedDate)} (Click again to reselect)`;
                 
                 updateCalendarSelection();
                 updateSummary();
+                return;
+            }
+            
+            // Third click - reset and start over
+            if (selectedStartDate && selectedEndDate && !isSelectingDates) {
+                selectedStartDate = clickedDate;
+                selectedEndDate = null;
+                isSelectingDates = true;
+                
+                document.getElementById('start-date').value = clickedDate;
+                document.getElementById('end-date').value = '';
+                document.getElementById('calendar-note').textContent = 
+                    `Start: ${formatDate(clickedDate)} - Now click your end date`;
+                
+                updateCalendarSelection();
+                updateSummary();
+                return;
             }
         },
         
