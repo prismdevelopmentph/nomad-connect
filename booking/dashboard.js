@@ -218,38 +218,160 @@ async function loadBlockedDates() {
 }
 
 // Date Picker Functions - REPLACE THIS ENTIRE SECTION
-function initializeDatePickers() {
-    // Initialize visual calendar
-    initializeCalendar();
+// Initialize FullCalendar
+function initializeCalendar() {
+    const calendarEl = document.getElementById('booking-calendar');
+    if (!calendarEl) return;
     
-    // Keep flatpickr for fallback/mobile
-    startDatePicker = flatpickr('#start-date', {
-        minDate: 'today',
-        dateFormat: 'Y-m-d',
-        disable: blockedDates,
-        onChange: function(selectedDates, dateStr) {
-            selectedStartDate = dateStr;
-            if (endDatePicker) {
-                endDatePicker.set('minDate', dateStr);
+    // Destroy existing calendar if any
+    if (calendar) {
+        calendar.destroy();
+    }
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+        },
+        selectable: true,
+        selectMirror: true,
+        validRange: {
+            start: new Date().toISOString().split('T')[0]
+        },
+        
+        // Handle date selection
+        select: function(info) {
+            const startDate = info.startStr;
+            const endDate = new Date(info.end);
+            endDate.setDate(endDate.getDate() - 1); // Adjust for FullCalendar's exclusive end
+            const endDateStr = endDate.toISOString().split('T')[0];
+            
+            // Check if any date in range is blocked
+            const selectedDates = getDatesInRange(startDate, endDateStr);
+            const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
+            
+            if (hasBlockedDate) {
+                alert('One or more selected dates are already booked. Please choose different dates.');
+                calendar.unselect();
+                return;
             }
+            
+            // Update selected dates
+            selectedStartDate = startDate;
+            selectedEndDate = endDateStr;
+            
+            // Update input fields
+            document.getElementById('start-date').value = startDate;
+            document.getElementById('end-date').value = endDateStr;
+            
+            // Update note
+            document.getElementById('calendar-note').textContent = 
+                `Selected: ${formatDate(startDate)} to ${formatDate(endDateStr)}`;
+            
             updateCalendarSelection();
             updateSummary();
+        },
+        
+        // Handle single date click
+        dateClick: function(info) {
+            const clickedDate = info.dateStr;
+            
+            // Check if date is blocked
+            if (blockedDates.includes(clickedDate)) {
+                alert('This date is already booked. Please choose another date.');
+                return;
+            }
+            
+            // If no start date or both dates selected, start new selection
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                selectedStartDate = clickedDate;
+                selectedEndDate = null;
+                document.getElementById('start-date').value = clickedDate;
+                document.getElementById('end-date').value = '';
+                document.getElementById('calendar-note').textContent = 
+                    'Now select your end date';
+            }
+            // If start date exists but no end date
+            else if (selectedStartDate && !selectedEndDate) {
+                // Ensure end date is after start date
+                if (clickedDate < selectedStartDate) {
+                    alert('End date must be after start date.');
+                    return;
+                }
+                
+                // Check if range has blocked dates
+                const selectedDates = getDatesInRange(selectedStartDate, clickedDate);
+                const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
+                
+                if (hasBlockedDate) {
+                    alert('One or more dates in this range are already booked. Please choose different dates.');
+                    return;
+                }
+                
+                selectedEndDate = clickedDate;
+                document.getElementById('end-date').value = clickedDate;
+                document.getElementById('calendar-note').textContent = 
+                    `Selected: ${formatDate(selectedStartDate)} to ${formatDate(clickedDate)}`;
+            }
+            
+            updateCalendarSelection();
+            updateSummary();
+        },
+        
+        // Style dates
+        dayCellDidMount: function(info) {
+            const dateStr = info.date.toISOString().split('T')[0];
+            
+            // Mark blocked dates
+            if (blockedDates.includes(dateStr)) {
+                info.el.classList.add('blocked');
+            }
+            // Mark past dates
+            else if (info.date < new Date().setHours(0, 0, 0, 0)) {
+                info.el.classList.add('fc-day-past');
+            }
+            // Mark available future dates
+            else {
+                info.el.classList.add('available');
+            }
         }
     });
     
-    endDatePicker = flatpickr('#end-date', {
-        minDate: 'today',
-        dateFormat: 'Y-m-d',
-        disable: blockedDates,
-        onChange: function(selectedDates, dateStr) {
-            selectedEndDate = dateStr;
-            updateCalendarSelection();
-            updateSummary();
-        }
-    });
+    calendar.render();
+    updateCalendarSelection();
 }
 
-updateCalendarSelection
+// Update calendar visual selection
+function updateCalendarSelection() {
+    if (!calendar) return;
+    
+    // Remove all selected classes
+    const allDayCells = document.querySelectorAll('#booking-calendar .fc-daygrid-day');
+    allDayCells.forEach(cell => cell.classList.remove('selected'));
+    
+    // Add selected class to range
+    if (selectedStartDate && selectedEndDate) {
+        const selectedDates = getDatesInRange(selectedStartDate, selectedEndDate);
+        
+        allDayCells.forEach(cell => {
+            const dateStr = cell.getAttribute('data-date');
+            if (dateStr && selectedDates.includes(dateStr)) {
+                cell.classList.add('selected');
+            }
+        });
+    }
+    // Highlight just start date if only start is selected
+    else if (selectedStartDate) {
+        allDayCells.forEach(cell => {
+            const dateStr = cell.getAttribute('data-date');
+            if (dateStr === selectedStartDate) {
+                cell.classList.add('selected');
+            }
+        });
+    }
+}
 
 function getDatesInRange(startDate, endDate) {
     const dates = [];
