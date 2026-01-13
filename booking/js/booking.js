@@ -20,26 +20,18 @@ async function loadConfig() {
     try {
         const response = await fetch('/api/config.js');
         CONFIG = await response.json();
+        console.log('✅ Configuration loaded from environment variables');
         return true;
     } catch (error) {
-        console.error('Failed to load config:', error);
+        console.error('❌ Failed to load config from API:', error);
         // Fallback to hardcoded values if API fails
         CONFIG = {
             supabase: {
                 url: 'YOUR_SUPABASE_URL',
                 anonKey: 'YOUR_SUPABASE_ANON_KEY'
-            },
-            emailjs: {
-                publicKey: 'YOUR_EMAILJS_PUBLIC_KEY',
-                serviceId: 'YOUR_SERVICE_ID',
-                templates: {
-                    user: 'YOUR_USER_TEMPLATE_ID',
-                    admin: 'YOUR_ADMIN_TEMPLATE_ID',
-                    approved: 'YOUR_APPROVED_TEMPLATE_ID',
-                    rejected: 'YOUR_REJECTED_TEMPLATE_ID'
-                }
             }
         };
+        console.warn('⚠️ Using fallback configuration');
         return false;
     }
 }
@@ -47,50 +39,58 @@ async function loadConfig() {
 // Initialize services after config is loaded
 function initializeServices() {
     // Initialize Supabase
-    if (window.supabase && CONFIG.supabase.url) {
+    if (window.supabase && CONFIG.supabase.url && CONFIG.supabase.url !== 'YOUR_SUPABASE_URL') {
         supabase = window.supabase.createClient(
             CONFIG.supabase.url, 
             CONFIG.supabase.anonKey
         );
-    }
-    
-    // Initialize EmailJS
-    if (window.emailjs && CONFIG.emailjs.publicKey) {
-        emailjs.init(CONFIG.emailjs.publicKey);
+        console.log('✅ Supabase initialized');
+    } else {
+        console.warn('⚠️ Supabase not configured - using demo mode');
     }
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', async function() {
-    // Load config first
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Initializing Nomad Connect Booking System...');
+    
+    // Load config from API
     await loadConfig();
     
-    // Then initialize services
+    // Initialize services
     initializeServices();
     
-    // Then start the app
-    checkUserSession();
+    // Setup event listeners
     setupEventListeners();
+    
+    // Check user session
+    checkUserSession();
+    
+    // Check URL hash for direct navigation
     checkUrlHash();
+    
+    console.log('✅ System initialized');
 });
 
-// Check URL hash for direct navigation
 function checkUrlHash() {
     const hash = window.location.hash;
-    if (hash === '#register' && !currentUser) {
+    if (!currentUser && hash === '#register') {
+        console.log('📝 Showing registration form from URL');
         showRegister();
-    } else if (hash === '#login' && !currentUser) {
+    } else if (!currentUser && hash === '#login') {
+        console.log('🔐 Showing login form from URL');
         showLogin();
     }
 }
 
-// Check if user is logged in
-async function checkUserSession() {
+function checkUserSession() {
     const userData = localStorage.getItem('nomad_user');
     if (userData) {
         currentUser = JSON.parse(userData);
+        console.log('👤 User session found:', currentUser.name);
         showDashboard();
     } else {
+        console.log('👤 No active session');
         const hash = window.location.hash;
         if (hash === '#register') {
             showRegister();
@@ -100,50 +100,93 @@ async function checkUserSession() {
     }
 }
 
-// Setup Event Listeners
 function setupEventListeners() {
-    // Auth navigation
-    document.getElementById('show-register').addEventListener('click', (e) => {
-        e.preventDefault();
-        showRegister();
-    });
+    console.log('⚙️ Setting up event listeners...');
     
-    document.getElementById('show-login').addEventListener('click', (e) => {
-        e.preventDefault();
-        showLogin();
-    });
+    // Register button clicks
+    const registerBtn = document.getElementById('register-btn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔘 Register button clicked');
+            showRegister();
+        });
+    }
     
-    document.getElementById('login-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showLogin();
-    });
+    // Login button clicks
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔘 Login button clicked');
+            showLogin();
+        });
+    }
     
-    document.getElementById('register-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showRegister();
-    });
+    // Show register link (inside login form)
+    const showRegisterLink = document.getElementById('show-register');
+    if (showRegisterLink) {
+        showRegisterLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔘 Show register link clicked');
+            showRegister();
+        });
+    }
     
-    // Forms
-    document.getElementById('login-form').addEventListener('submit', handleLogin);
-    document.getElementById('register-form').addEventListener('submit', handleRegister);
-    document.getElementById('booking-form').addEventListener('submit', handleBooking);
+    // Show login link (inside register form)
+    const showLoginLink = document.getElementById('show-login');
+    if (showLoginLink) {
+        showLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔘 Show login link clicked');
+            showLogin();
+        });
+    }
     
-    // Logout
-    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    // Form submissions
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+    }
+    
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', handleBooking);
+    }
+    
+    // Logout buttons
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
     
     // Calendar navigation
-    document.getElementById('prev-month').addEventListener('click', () => {
-        currentMonth.setMonth(currentMonth.getMonth() - 1);
-        renderCalendar();
-    });
+    const prevMonth = document.getElementById('prev-month');
+    if (prevMonth) {
+        prevMonth.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        });
+    }
     
-    document.getElementById('next-month').addEventListener('click', () => {
-        currentMonth.setMonth(currentMonth.getMonth() + 1);
-        renderCalendar();
-    });
+    const nextMonth = document.getElementById('next-month');
+    if (nextMonth) {
+        nextMonth.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        });
+    }
     
     // Plan type change
-    document.getElementById('plan-type').addEventListener('change', calculateTotal);
+    const planType = document.getElementById('plan-type');
+    if (planType) {
+        planType.addEventListener('change', calculateTotal);
+    }
     
     // Booking tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -157,17 +200,21 @@ function setupEventListeners() {
     // Mobile menu
     const mobileToggle = document.getElementById('mobile-toggle');
     const navMenu = document.getElementById('nav-menu');
+    if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+        });
+    }
     
-    mobileToggle.addEventListener('click', function() {
-        navMenu.classList.toggle('active');
-    });
-    
-    // Listen for hash changes
+    // Hash change listener
     window.addEventListener('hashchange', checkUrlHash);
+    
+    console.log('✅ Event listeners set up');
 }
 
 // Show/Hide Sections
 function showLogin() {
+    console.log('🔐 Showing login section');
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('dashboard-section').style.display = 'none';
@@ -175,6 +222,7 @@ function showLogin() {
 }
 
 function showRegister() {
+    console.log('📝 Showing register section');
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'block';
     document.getElementById('dashboard-section').style.display = 'none';
@@ -182,21 +230,30 @@ function showRegister() {
 }
 
 function showDashboard() {
+    console.log('📊 Showing dashboard');
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('dashboard-section').style.display = 'block';
     window.location.hash = 'dashboard';
     
     // Update header buttons
-    document.getElementById('header-buttons').innerHTML = `
-        <span style="color: var(--dark-teal); font-weight: 600; margin-right: 12px;">
-            ${currentUser.name}
-        </span>
-        <button id="logout-btn-header" class="btn btn-secondary">Logout</button>
-    `;
+    const headerButtons = document.getElementById('header-buttons');
+    if (headerButtons && currentUser) {
+        headerButtons.innerHTML = `
+            <span style="color: var(--dark-teal); font-weight: 600; margin-right: 12px;">
+                ${currentUser.name}
+            </span>
+            <button id="logout-btn-header" class="btn btn-secondary">Logout</button>
+        `;
+        
+        // Add logout handler for header button
+        document.getElementById('logout-btn-header').addEventListener('click', handleLogout);
+    }
     
-    document.getElementById('logout-btn-header').addEventListener('click', handleLogout);
-    document.getElementById('user-name').textContent = currentUser.name;
+    const userName = document.getElementById('user-name');
+    if (userName && currentUser) {
+        userName.textContent = currentUser.name;
+    }
     
     loadBookedDates();
     renderCalendar();
@@ -206,6 +263,7 @@ function showDashboard() {
 // Handle Registration
 async function handleRegister(e) {
     e.preventDefault();
+    console.log('📝 Registration form submitted');
     
     const name = document.getElementById('register-name').value;
     const email = document.getElementById('register-email').value;
@@ -234,6 +292,13 @@ async function handleRegister(e) {
         return;
     }
     
+    // Check if Supabase is configured
+    if (!supabase) {
+        errorDiv.textContent = 'Database not configured. Please set up Supabase environment variables.';
+        errorDiv.classList.add('show');
+        return;
+    }
+    
     try {
         // Hash password (simple method - in production use bcrypt)
         const hashedPassword = btoa(password);
@@ -247,6 +312,7 @@ async function handleRegister(e) {
             .select();
         
         if (error) {
+            console.error('❌ Registration error:', error);
             if (error.code === '23505') {
                 errorDiv.textContent = 'Email already registered';
             } else {
@@ -256,6 +322,7 @@ async function handleRegister(e) {
             return;
         }
         
+        console.log('✅ User registered successfully');
         successDiv.textContent = 'Account created successfully! Please login.';
         successDiv.classList.add('show');
         
@@ -266,6 +333,7 @@ async function handleRegister(e) {
         setTimeout(() => showLogin(), 2000);
         
     } catch (err) {
+        console.error('❌ Registration exception:', err);
         errorDiv.textContent = 'An error occurred: ' + err.message;
         errorDiv.classList.add('show');
     }
@@ -274,12 +342,20 @@ async function handleRegister(e) {
 // Handle Login
 async function handleLogin(e) {
     e.preventDefault();
+    console.log('🔐 Login form submitted');
     
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errorDiv = document.getElementById('login-error');
     
     errorDiv.classList.remove('show');
+    
+    // Check if Supabase is configured
+    if (!supabase) {
+        errorDiv.textContent = 'Database not configured. Please set up Supabase environment variables.';
+        errorDiv.classList.add('show');
+        return;
+    }
     
     try {
         const hashedPassword = btoa(password);
@@ -292,16 +368,19 @@ async function handleLogin(e) {
             .single();
         
         if (error || !data) {
+            console.error('❌ Login failed');
             errorDiv.textContent = 'Invalid email or password';
             errorDiv.classList.add('show');
             return;
         }
         
+        console.log('✅ Login successful:', data.name);
         currentUser = data;
         localStorage.setItem('nomad_user', JSON.stringify(data));
         showDashboard();
         
     } catch (err) {
+        console.error('❌ Login exception:', err);
         errorDiv.textContent = 'Login failed: ' + err.message;
         errorDiv.classList.add('show');
     }
@@ -309,30 +388,37 @@ async function handleLogin(e) {
 
 // Handle Logout
 function handleLogout() {
+    console.log('👋 Logging out');
     currentUser = null;
     localStorage.removeItem('nomad_user');
-    showLogin();
     
     // Reset header buttons
-    document.getElementById('header-buttons').innerHTML = `
-        <a href="#login" class="btn btn-secondary" id="login-btn">Login</a>
-        <a href="#register" class="btn btn-primary" id="register-btn">Sign Up</a>
-    `;
+    const headerButtons = document.getElementById('header-buttons');
+    if (headerButtons) {
+        headerButtons.innerHTML = `
+            <a href="#login" class="btn btn-secondary" id="login-btn">Login</a>
+            <a href="#register" class="btn btn-primary" id="register-btn">Sign Up</a>
+        `;
+        
+        // Re-attach event listeners
+        document.getElementById('login-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showLogin();
+        });
+        
+        document.getElementById('register-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showRegister();
+        });
+    }
     
-    // Re-attach event listeners
-    document.getElementById('login-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showLogin();
-    });
-    
-    document.getElementById('register-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showRegister();
-    });
+    showLogin();
 }
 
 // Load Booked Dates
 async function loadBookedDates() {
+    if (!supabase) return;
+    
     try {
         const { data, error } = await supabase
             .from('bookings')
@@ -342,10 +428,11 @@ async function loadBookedDates() {
         if (error) throw error;
         
         bookedDates = data || [];
+        console.log('📅 Loaded', bookedDates.length, 'booked dates');
         renderCalendar();
         
     } catch (err) {
-        console.error('Error loading booked dates:', err);
+        console.error('❌ Error loading booked dates:', err);
     }
 }
 
@@ -353,6 +440,8 @@ async function loadBookedDates() {
 function renderCalendar() {
     const calendar = document.getElementById('calendar');
     const monthYear = document.getElementById('calendar-month-year');
+    
+    if (!calendar || !monthYear) return;
     
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -507,6 +596,7 @@ function calculateTotal() {
 // Handle Booking
 async function handleBooking(e) {
     e.preventDefault();
+    console.log('📅 Booking form submitted');
     
     const errorDiv = document.getElementById('booking-error');
     const successDiv = document.getElementById('booking-success');
@@ -516,6 +606,12 @@ async function handleBooking(e) {
     
     if (!selectedStartDate || !selectedEndDate) {
         errorDiv.textContent = 'Please select start and end dates';
+        errorDiv.classList.add('show');
+        return;
+    }
+    
+    if (!supabase) {
+        errorDiv.textContent = 'Database not configured. Please set up Supabase environment variables.';
         errorDiv.classList.add('show');
         return;
     }
@@ -541,10 +637,8 @@ async function handleBooking(e) {
         
         if (error) throw error;
         
-        // Send email notifications
-        await sendBookingEmails(data[0]);
-        
-        successDiv.textContent = 'Booking submitted successfully! Waiting for admin approval.';
+        console.log('✅ Booking created successfully');
+        successDiv.textContent = 'Booking submitted successfully! Waiting for admin approval. (Email notifications disabled)';
         successDiv.classList.add('show');
         
         // Reset form
@@ -559,49 +653,23 @@ async function handleBooking(e) {
         
         // Scroll to bookings section
         setTimeout(() => {
-            document.querySelector('.my-bookings-section').scrollIntoView({ behavior: 'smooth' });
+            const bookingsSection = document.querySelector('.my-bookings-section');
+            if (bookingsSection) {
+                bookingsSection.scrollIntoView({ behavior: 'smooth' });
+            }
         }, 1500);
         
     } catch (err) {
+        console.error('❌ Booking error:', err);
         errorDiv.textContent = 'Booking failed: ' + err.message;
         errorDiv.classList.add('show');
     }
 }
 
-// Send Booking Emails
-async function sendBookingEmails(booking) {
-    try {
-        // Email to user
-        await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templates.user, {
-            to_email: currentUser.email,
-            to_name: currentUser.name,
-            booking_id: booking.id,
-            start_date: formatDateDisplay(new Date(booking.start_date)),
-            end_date: formatDateDisplay(new Date(booking.end_date)),
-            plan_type: booking.plan_type,
-            total_price: booking.total_price
-        });
-        
-        // Email to admin
-        await emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templates.admin, {
-            to_email: 'admin@nomadconnect.ph',
-            customer_name: currentUser.name,
-            customer_email: currentUser.email,
-            customer_phone: currentUser.phone,
-            booking_id: booking.id,
-            start_date: formatDateDisplay(new Date(booking.start_date)),
-            end_date: formatDateDisplay(new Date(booking.end_date)),
-            plan_type: booking.plan_type,
-            total_price: booking.total_price
-        });
-        
-    } catch (err) {
-        console.error('Error sending emails:', err);
-    }
-}
-
 // Load User Bookings
 async function loadUserBookings() {
+    if (!supabase) return;
+    
     try {
         const { data, error } = await supabase
             .from('bookings')
@@ -612,16 +680,19 @@ async function loadUserBookings() {
         if (error) throw error;
         
         userBookings = data || [];
+        console.log('📋 Loaded', userBookings.length, 'user bookings');
         filterBookings('all');
         
     } catch (err) {
-        console.error('Error loading bookings:', err);
+        console.error('❌ Error loading bookings:', err);
     }
 }
 
 // Filter Bookings
 function filterBookings(filter) {
     const bookingsList = document.getElementById('bookings-list');
+    
+    if (!bookingsList) return;
     
     let filtered = userBookings;
     if (filter !== 'all') {
