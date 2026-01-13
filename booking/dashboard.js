@@ -420,7 +420,7 @@ function closeModals() {
 function updateSummary() {
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
-    const DAILY_RATE = 1399;
+    const DAILY_RATE = 1399; // ← UPDATED PRICE
     
     if (startDate && endDate) {
         const start = new Date(startDate);

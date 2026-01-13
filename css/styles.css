@@ -580,6 +580,19 @@ nav a:hover::after {
     font-style: italic;
 }
 
+.pricing-single {
+    display: flex;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.pricing-single .pricing-card {
+    width: 100%;
+}
+
 /* Coverage Section */
 .coverage {
     min-height: 100vh;
