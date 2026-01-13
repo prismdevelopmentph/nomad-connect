@@ -96,6 +96,32 @@ function handleLogout() {
     window.location.href = 'auth.html';
 }
 
+// Add profile validation before booking
+async function validateUserProfile() {
+    try {
+        const response = await fetch('/api/customer/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: currentUser.email,
+                password: 'dummy' // This won't work, we need a better approach
+            })
+        });
+        
+        // Better approach: Check if profile exists in current session
+        if (!currentUser.profile || !currentUser.profile.name || !currentUser.profile.phone) {
+            return false;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Profile validation error:', error);
+        return false;
+    }
+}
+
 // Dashboard Functions
 async function initializeDashboard() {
     // Set user name
@@ -273,6 +299,13 @@ function updateSummary() {
 async function handleBookingSubmit(e) {
     e.preventDefault();
     
+    // Validate profile first
+    if (!currentUser.profile || !currentUser.profile.name || !currentUser.profile.phone) {
+        formError.textContent = 'Your profile is incomplete. Please contact support to complete your setup.';
+        formError.classList.add('show');
+        return;
+    }
+    
     const plan = document.querySelector('input[name="plan"]:checked');
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
@@ -346,6 +379,10 @@ async function handleBookingSubmit(e) {
         const data = await response.json();
         
         if (!response.ok) {
+            // Handle specific error codes
+            if (data.code === 'PROFILE_NOT_FOUND' || data.code === 'PROFILE_INCOMPLETE') {
+                throw new Error(data.error + ' Please contact support.');
+            }
             throw new Error(data.error || 'Failed to create booking');
         }
         

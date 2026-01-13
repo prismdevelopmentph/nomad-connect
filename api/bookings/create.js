@@ -66,8 +66,20 @@ module.exports = async (req, res) => {
             .eq('user_id', user.id)
             .single();
 
-        if (profileError) {
-            return res.status(400).json({ error: 'User profile not found' });
+        if (profileError || !profile) {
+            console.error('Profile fetch error:', profileError);
+            return res.status(400).json({ 
+                error: 'User profile not found. Please contact support to complete your profile setup.',
+                code: 'PROFILE_NOT_FOUND'
+            });
+        }
+
+        // Validate required profile fields
+        if (!profile.name || !profile.phone) {
+            return res.status(400).json({ 
+                error: 'Your profile is incomplete. Please ensure your name and phone number are set.',
+                code: 'PROFILE_INCOMPLETE'
+            });
         }
 
         // Check for date conflicts

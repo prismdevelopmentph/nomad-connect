@@ -64,7 +64,9 @@ module.exports = async (req, res) => {
 
         if (profileError) {
             console.error('Profile creation error:', profileError);
-            // Continue anyway, profile can be created later
+            // If profile creation fails, we need to clean up the auth user
+            // Note: This requires service role key, so we'll just throw an error
+            throw new Error('Failed to create user profile. Please contact support or try again.');
         }
 
         // Create user role (customer)
