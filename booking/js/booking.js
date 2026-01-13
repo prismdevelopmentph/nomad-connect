@@ -31,7 +31,18 @@ const pricing = {
 document.addEventListener('DOMContentLoaded', function() {
     checkUserSession();
     setupEventListeners();
+    checkUrlHash(); // Check if user came from a specific link
 });
+
+// Check URL hash for direct navigation
+function checkUrlHash() {
+    const hash = window.location.hash;
+    if (hash === '#register' && !currentUser) {
+        showRegister();
+    } else if (hash === '#login' && !currentUser) {
+        showLogin();
+    }
+}
 
 // Check if user is logged in
 async function checkUserSession() {
@@ -40,7 +51,13 @@ async function checkUserSession() {
         currentUser = JSON.parse(userData);
         showDashboard();
     } else {
-        showLogin();
+        // Check hash before showing default login
+        const hash = window.location.hash;
+        if (hash === '#register') {
+            showRegister();
+        } else {
+            showLogin();
+        }
     }
 }
 
@@ -50,21 +67,25 @@ function setupEventListeners() {
     document.getElementById('show-register').addEventListener('click', (e) => {
         e.preventDefault();
         showRegister();
+        window.location.hash = 'register';
     });
     
     document.getElementById('show-login').addEventListener('click', (e) => {
         e.preventDefault();
         showLogin();
+        window.location.hash = 'login';
     });
     
     document.getElementById('login-btn').addEventListener('click', (e) => {
         e.preventDefault();
         showLogin();
+        window.location.hash = 'login';
     });
     
     document.getElementById('register-btn').addEventListener('click', (e) => {
         e.preventDefault();
         showRegister();
+        window.location.hash = 'register';
     });
     
     // Forms
@@ -105,6 +126,9 @@ function setupEventListeners() {
     mobileToggle.addEventListener('click', function() {
         navMenu.classList.toggle('active');
     });
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', checkUrlHash);
 }
 
 // Show/Hide Sections
@@ -112,18 +136,21 @@ function showLogin() {
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('dashboard-section').style.display = 'none';
+    window.location.hash = 'login';
 }
 
 function showRegister() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'block';
     document.getElementById('dashboard-section').style.display = 'none';
+    window.location.hash = 'register';
 }
 
 function showDashboard() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('dashboard-section').style.display = 'block';
+    window.location.hash = 'dashboard';
     
     // Update header buttons
     document.getElementById('header-buttons').innerHTML = `
