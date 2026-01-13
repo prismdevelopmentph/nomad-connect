@@ -112,7 +112,9 @@ module.exports = async (req, res) => {
                 end_date: end_date,
                 plan_type: plan_type,
                 total_price: total_price,
+                down_payment: req.body.down_payment || (total_price * 0.5), 
                 payment_method: payment_method,
+                payment_proof_url: payment_proof_url,
                 special_requests: special_requests,
                 status: 'pending'
             })

@@ -69,44 +69,14 @@
             <h2>Create New Booking</h2>
             
             <form id="booking-form">
-                <!-- Step 1: Plan Selection -->
+                <!-- Rental Information -->
                 <div class="form-section">
-                    <h3>Select Your Plan</h3>
-                    <div class="plan-selector">
-                        <label class="plan-option">
-                            <input type="radio" name="plan" value="daily" data-price="1500" required>
-                            <div class="plan-card">
-                                <div class="plan-icon">📅</div>
-                                <h4>Daily</h4>
-                                <p class="plan-price">₱1,500/day</p>
-                                <p class="plan-desc">Perfect for short trips</p>
-                            </div>
-                        </label>
-                        <label class="plan-option">
-                            <input type="radio" name="plan" value="weekly" data-price="8500" required>
-                            <div class="plan-card featured">
-                                <div class="plan-badge">Best Value</div>
-                                <div class="plan-icon">📆</div>
-                                <h4>Weekly</h4>
-                                <p class="plan-price">₱8,500/week</p>
-                                <p class="plan-desc">Ideal for getaways</p>
-                            </div>
-                        </label>
-                        <label class="plan-option">
-                            <input type="radio" name="plan" value="monthly" data-price="28000" required>
-                            <div class="plan-card">
-                                <div class="plan-icon">📋</div>
-                                <h4>Monthly</h4>
-                                <p class="plan-price">₱28,000/month</p>
-                                <p class="plan-desc">Long-term solution</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Step 2: Date Selection -->
-                <div class="form-section">
-                    <h3>Select Dates</h3>
+                    <h3>Rental Information</h3>
+                    <p style="background: rgba(79, 163, 154, 0.1); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong style="color: var(--dark-teal); font-size: 18px;">Daily Rate: ₱1,399</strong><br>
+                        <span style="color: var(--text-light); font-size: 14px;">50% down payment required to confirm reservation</span>
+                    </p>
+                    
                     <div class="date-inputs">
                         <div class="form-group">
                             <label for="start-date">Start Date</label>
@@ -120,7 +90,7 @@
                     <p class="date-note">Select available dates for your rental period</p>
                 </div>
 
-                <!-- Step 3: Delivery Details -->
+                <!-- Delivery Details -->
                 <div class="form-section">
                     <h3>Delivery Details</h3>
                     <div class="form-group">
@@ -133,9 +103,14 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Payment -->
+                <!-- Payment -->
                 <div class="form-section">
-                    <h3>Payment Method</h3>
+                    <h3>Down Payment (50%)</h3>
+                    <p style="background: rgba(255, 152, 0, 0.1); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--warning);">
+                        <strong>⚠️ Important:</strong> Pay 50% down payment to confirm your reservation. 
+                        Remaining balance, security deposit, and valid ID required upon pickup/delivery.
+                    </p>
+                    
                     <div class="payment-selector">
                         <label class="payment-option">
                             <input type="radio" name="payment" value="gcash" required>
@@ -150,7 +125,7 @@
                             <div class="payment-card">
                                 <div class="payment-icon">💵</div>
                                 <h4>Direct Payment</h4>
-                                <p>Cash on delivery</p>
+                                <p>Pay upon pickup/delivery</p>
                             </div>
                         </label>
                     </div>
@@ -160,17 +135,40 @@
                         <div class="gcash-instructions">
                             <h4>GCash Payment Instructions:</h4>
                             <ol>
-                                <li>Send payment to: <strong>0912-XXX-XXXX</strong></li>
+                                <li>Send <strong>50% down payment</strong> to: <strong>0912-XXX-XXXX</strong></li>
                                 <li>Use reference: <strong>NC-[Your Name]</strong></li>
                                 <li>Upload screenshot below</li>
                             </ol>
                         </div>
                         <div class="form-group">
                             <label for="payment-proof">Upload Payment Proof</label>
-                            <input type="file" id="payment-proof" accept="image/*" required>
+                            <input type="file" id="payment-proof" accept="image/*">
                             <p class="file-note">Upload screenshot of your GCash payment</p>
                         </div>
                         <div id="image-preview"></div>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-section">
+                    <h3>Terms & Conditions</h3>
+                    <div style="background: var(--cream); padding: 20px; border-radius: 12px; max-height: 300px; overflow-y: auto; border: 2px solid var(--sand);">
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>A <strong>50% down payment</strong> is required to reserve the equipment/date.</li>
+                            <li>Full payment, security deposit, and a <strong>valid government-issued ID</strong> are required upon pickup or before delivery of the equipment.</li>
+                            <li><strong>Strictly no refunds</strong> once payment is made.</li>
+                            <li>Reservations are confirmed only after the down payment is received.</li>
+                            <li>Rental period starts upon release of the equipment and ends at the agreed return time.</li>
+                            <li><strong>Late returns may incur additional charges.</strong></li>
+                            <li>The renter is <strong>fully responsible for any loss or damage</strong> to the equipment.</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 16px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="terms-checkbox" required style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="font-weight: 600; color: var(--dark-teal);">I have read and agree to the Terms & Conditions</span>
+                        </label>
                     </div>
                 </div>
 
@@ -178,8 +176,8 @@
                 <div class="price-summary">
                     <h3>Booking Summary</h3>
                     <div class="summary-row">
-                        <span>Plan:</span>
-                        <span id="summary-plan">-</span>
+                        <span>Daily Rate:</span>
+                        <span>₱1,399</span>
                     </div>
                     <div class="summary-row">
                         <span>Duration:</span>
@@ -190,17 +188,19 @@
                         <span id="summary-dates">-</span>
                     </div>
                     <div class="summary-row total">
-                        <span>Total:</span>
+                        <span>Total Amount:</span>
                         <span id="summary-total">₱0</span>
+                    </div>
+                    <div class="summary-row" style="border-top: 2px solid var(--warning); background: rgba(255, 152, 0, 0.05); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                        <span style="font-weight: 600;">Down Payment (50%):</span>
+                        <span id="summary-down-payment" style="font-weight: 700; color: var(--warning);">₱0</span>
                     </div>
                 </div>
 
                 <div id="form-error" class="error-message"></div>
                 <button type="submit" class="btn btn-primary btn-full">Submit Booking</button>
             </form>
-        </div>
-    </div>
-
+            
     <!-- Booking Detail Modal -->
     <div id="detail-modal" class="modal">
         <div class="modal-content">

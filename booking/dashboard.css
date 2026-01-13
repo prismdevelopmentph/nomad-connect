@@ -649,3 +649,23 @@ body {
         padding: 24px 20px;
     }
 }
+
+/* Terms & Conditions */
+#terms-checkbox {
+    accent-color: var(--primary-teal);
+}
+
+.form-section ul {
+    list-style-position: outside;
+    padding-left: 20px;
+}
+
+.form-section ul li {
+    margin-bottom: 12px;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.form-section ul li strong {
+    color: var(--dark-teal);
+}

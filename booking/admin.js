@@ -223,7 +223,14 @@ function renderBookingsTable() {
                             <td><span class="status-badge ${booking.status}">${capitalizeFirst(booking.status)}</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn view-btn" onclick="viewBooking('${booking.id}')">View</button>
+                                    <button class="action-btn view-btn" onclick="viewBooking('${booking.id}')">View Details</button>
+                                    ${booking.payment_method === 'gcash' && booking.payment_proof_url ? `
+                                        <button class="action-btn" 
+                                                style="background: #00BFA5; color: white;" 
+                                                onclick="window.open('${booking.payment_proof_url}', '_blank')">
+                                            💳 Payment
+                                        </button>
+                                    ` : ''}
                                 </div>
                             </td>
                         </tr>
@@ -295,6 +302,26 @@ function viewBooking(bookingId) {
             <span class="detail-label">Booked On:</span>
             <span class="detail-value">${formatDateTime(booking.created_at)}</span>
         </div>
+        
+        <!-- PAYMENT PROOF SECTION - NEW -->
+        ${booking.payment_method === 'gcash' ? `
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--sand);">
+                <h3 style="color: var(--dark-teal); margin-bottom: 16px; font-size: 18px;">Payment Proof</h3>
+                ${booking.payment_proof_url ? `
+                    <div style="text-align: center;">
+                        <img src="${booking.payment_proof_url}" 
+                             alt="Payment Proof" 
+                             style="max-width: 100%; max-height: 400px; border-radius: 12px; border: 2px solid var(--sand); cursor: pointer;"
+                             onclick="window.open('${booking.payment_proof_url}', '_blank')">
+                        <p style="margin-top: 12px; color: var(--text-light); font-size: 12px;">
+                            Click image to view full size
+                        </p>
+                    </div>
+                ` : `
+                    <p style="color: var(--text-light); text-align: center;">No payment proof uploaded</p>
+                `}
+            </div>
+        ` : ''}
     `;
     
     document.getElementById('booking-details').innerHTML = detailsHTML;

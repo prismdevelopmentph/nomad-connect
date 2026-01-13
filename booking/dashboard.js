@@ -38,10 +38,6 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Plan selection
-document.querySelectorAll('input[name="plan"]').forEach(radio => {
-    radio.addEventListener('change', updateSummary);
-});
 
 // Payment method
 document.querySelectorAll('input[name="payment"]').forEach(radio => {
@@ -255,43 +251,28 @@ function closeModals() {
 }
 
 function updateSummary() {
-    const planRadio = document.querySelector('input[name="plan"]:checked');
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
-    
-    // Update plan
-    if (planRadio) {
-        document.getElementById('summary-plan').textContent = capitalizeFirst(planRadio.value);
-    } else {
-        document.getElementById('summary-plan').textContent = '-';
-    }
+    const DAILY_RATE = 1399;
     
     // Calculate duration and total
-    if (startDate && endDate && planRadio) {
+    if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
         const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
         
-        const pricePerDay = parseFloat(planRadio.dataset.price);
-        let total = 0;
-        
-        if (planRadio.value === 'daily') {
-            total = pricePerDay * days;
-        } else if (planRadio.value === 'weekly') {
-            const weeks = Math.ceil(days / 7);
-            total = pricePerDay * weeks;
-        } else if (planRadio.value === 'monthly') {
-            const months = Math.ceil(days / 30);
-            total = pricePerDay * months;
-        }
+        const total = DAILY_RATE * days;
+        const downPayment = total * 0.5; // 50% down payment
         
         document.getElementById('summary-duration').textContent = `${days} day${days > 1 ? 's' : ''}`;
         document.getElementById('summary-dates').textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
         document.getElementById('summary-total').textContent = `₱${total.toLocaleString('en-PH')}`;
+        document.getElementById('summary-down-payment').textContent = `₱${downPayment.toLocaleString('en-PH')}`;
     } else {
         document.getElementById('summary-duration').textContent = '-';
         document.getElementById('summary-dates').textContent = '-';
         document.getElementById('summary-total').textContent = '₱0';
+        document.getElementById('summary-down-payment').textContent = '₱0';
     }
 }
 
@@ -306,20 +287,26 @@ async function handleBookingSubmit(e) {
         return;
     }
     
-    const plan = document.querySelector('input[name="plan"]:checked');
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
     const deliveryAddress = document.getElementById('delivery-address').value;
     const specialRequests = document.getElementById('special-requests').value;
     const payment = document.querySelector('input[name="payment"]:checked');
     const paymentProofFile = document.getElementById('payment-proof').files[0];
+    const termsAccepted = document.getElementById('terms-checkbox').checked;
     const submitBtn = e.target.querySelector('button[type="submit"]');
     
     formError.classList.remove('show');
     
     // Validation
-    if (!plan || !startDate || !endDate || !deliveryAddress || !payment) {
+    if (!startDate || !endDate || !deliveryAddress || !payment) {
         formError.textContent = 'Please fill in all required fields';
+        formError.classList.add('show');
+        return;
+    }
+    
+    if (!termsAccepted) {
+        formError.textContent = 'Please accept the Terms & Conditions';
         formError.classList.add('show');
         return;
     }
@@ -334,22 +321,14 @@ async function handleBookingSubmit(e) {
     submitBtn.textContent = 'Submitting...';
     
     try {
+        const DAILY_RATE = 1399;
+        
         // Calculate total
         const start = new Date(startDate);
         const end = new Date(endDate);
         const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-        const pricePerPeriod = parseFloat(plan.dataset.price);
-        
-        let total = 0;
-        if (plan.value === 'daily') {
-            total = pricePerPeriod * days;
-        } else if (plan.value === 'weekly') {
-            const weeks = Math.ceil(days / 7);
-            total = pricePerPeriod * weeks;
-        } else if (plan.value === 'monthly') {
-            const months = Math.ceil(days / 30);
-            total = pricePerPeriod * months;
-        }
+        const total = DAILY_RATE * days;
+        const downPayment = total * 0.5;
         
         // Upload payment proof if GCash
         let paymentProofUrl = null;
@@ -365,21 +344,21 @@ async function handleBookingSubmit(e) {
                 'Authorization': `Bearer ${currentUser.access_token}`
             },
             body: JSON.stringify({
-                plan_type: plan.value,
+                plan_type: 'daily', // Fixed plan type
                 start_date: startDate,
                 end_date: endDate,
                 delivery_address: deliveryAddress,
                 special_requests: specialRequests,
                 payment_method: payment.value,
                 payment_proof_url: paymentProofUrl,
-                total_price: total
+                total_price: total,
+                down_payment: downPayment
             })
         });
         
         const data = await response.json();
         
         if (!response.ok) {
-            // Handle specific error codes
             if (data.code === 'PROFILE_NOT_FOUND' || data.code === 'PROFILE_INCOMPLETE') {
                 throw new Error(data.error + ' Please contact support.');
             }
@@ -388,9 +367,9 @@ async function handleBookingSubmit(e) {
         
         // Success
         closeModals();
-        alert('Booking submitted successfully! We will review and confirm your booking shortly.');
+        alert('Booking submitted successfully! We will review and confirm your booking shortly.\n\nReminder: Full payment, security deposit, and valid ID required upon pickup/delivery.');
         
-        // Redirect to Facebook (you'll replace with your actual URL)
+        // Redirect to Facebook
         setTimeout(() => {
             window.open('https://facebook.com/YOUR_PAGE_HERE', '_blank');
         }, 1000);
