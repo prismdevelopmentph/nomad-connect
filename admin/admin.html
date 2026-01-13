@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Nomad Connect</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/logo.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../booking/css/booking.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../images/logo.png" alt="Nomad Connect" class="logo-image">
+                    <div class="logo-text">
+                        <span class="logo-title">NOMAD CONNECT</span>
+                        <span class="logo-subtitle">Admin Panel</span>
+                    </div>
+                </div>
+                <nav id="nav-menu">
+                    <a href="../index.html">Home</a>
+                    <a href="../booking/index.html">Bookings</a>
+                    <a href="index.html">Admin</a>
+                </nav>
+                <div class="cta-buttons" id="header-buttons">
+                    <a href="#login" class="btn btn-secondary" id="admin-login-btn">Admin Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Login Section -->
+    <section id="admin-login-section" class="auth-section">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-teal), var(--ocean-blue)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px;">
+                            🔐
+                        </div>
+                    </div>
+                    <h2 class="auth-title">Admin Access</h2>
+                    <p class="auth-subtitle">Login to manage bookings</p>
+                    <form id="admin-login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="admin-email">Admin Email</label>
+                            <input type="email" id="admin-email" required placeholder="admin@nomadconnect.ph">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-password">Password</label>
+                            <input type="password" id="admin-password" required placeholder="••••••••">
+                        </div>
+                        <div id="admin-login-error" class="error-message"></div>
+                        <button type="submit" class="btn btn-primary btn-full btn-lg">Login as Admin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard -->
+    <section id="admin-dashboard-section" class="admin-dashboard-section" style="display: none;">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h2 class="section-title">Admin Dashboard</h2>
+                    <p class="user-welcome">Managing Nomad Connect Bookings</p>
+                </div>
+                <button id="admin-logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fff4e6; color: #ff9800;">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Pending Bookings</div>
+                        <div class="stat-value" id="stat-pending">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e8f5e9; color: #4caf50;">✓</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Approved Bookings</div>
+                        <div class="stat-value" id="stat-approved">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e3f2fd; color: #2196f3;">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value" id="stat-total">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f3e5f5; color: #9c27b0;">₱</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value" id="stat-revenue">₱0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Overview -->
+            <div class="admin-section">
+                <h3 class="subsection-title">Calendar Overview</h3>
+                <div class="admin-calendar-container">
+                    <div class="calendar-header">
+                        <button id="admin-prev-month" class="calendar-nav">‹</button>
+                        <h4 id="admin-calendar-month-year"></h4>
+                        <button id="admin-next-month" class="calendar-nav">›</button>
+                    </div>
+                    <div class="calendar-legend">
+                        <span class="legend-item"><span class="legend-box available"></span> Available</span>
+                        <span class="legend-item"><span class="legend-box booked"></span> Approved</span>
+                        <span class="legend-item"><span class="legend-box" style="background: #fff4e6;"></span> Pending</span>
+                    </div>
+                    <div id="admin-calendar" class="calendar-grid"></div>
+                </div>
+            </div>
+
+            <!-- Bookings Management -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="subsection-title">Manage Bookings</h3>
+                    <div class="admin-filters">
+                        <select id="status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button id="refresh-bookings" class="btn btn-secondary">🔄 Refresh</button>
+                    </div>
+                </div>
+                <div id="admin-bookings-list" class="admin-bookings-list">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Detail Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 class="modal-title">Booking Details</h3>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="../images/logo.png" alt="Nomad Connect" class="logo-image">
+                        <div class="logo-text">
+                            <span class="logo-title">NOMAD CONNECT</span>
+                            <span class="logo-subtitle">Starlink Rentals</span>
+                        </div>
+                    </div>
+                    <p>Bringing satellite internet connectivity to every corner of the Philippines.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="../index.html">Home</a>
+                    <a href="../booking/index.html">Book Now</a>
+                    <a href="index.html">Admin</a>
+                </div>
+                <div class="footer-contact">
+                    <h4>Get in Touch</h4>
+                    <p>📧 hello@nomadconnect.ph</p>
+                    <p>📱 +63 XXX XXX XXXX</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nomad Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Environment Config from Vercel API -->
+    <script src="/api/env.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

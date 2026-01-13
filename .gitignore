@@ -1,20 +1,22 @@
 # Dependencies
 node_modules/
 package-lock.json
-
-# Vercel
-.vercel
+yarn.lock
 
 # Environment variables
 .env
 .env.local
-.env*.local
+.env.development
+.env.production
 
-# OS files
+# Vercel
+.vercel
+
+# Operating System
 .DS_Store
 Thumbs.db
 
-# Editor directories
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -22,6 +24,15 @@ Thumbs.db
 *~
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Temporary files
+*.tmp
+.cache/
+
+# Build outputs
+dist/
+build/

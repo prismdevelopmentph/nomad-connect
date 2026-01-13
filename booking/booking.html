@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Now - Nomad Connect</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/logo.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="css/booking.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../images/logo.png" alt="Nomad Connect" class="logo-image">
+                    <div class="logo-text">
+                        <span class="logo-title">NOMAD CONNECT</span>
+                        <span class="logo-subtitle">Starlink Rentals</span>
+                    </div>
+                </div>
+                <nav id="nav-menu">
+                    <a href="../index.html">Home</a>
+                    <a href="../index.html#about">About</a>
+                    <a href="../index.html#pricing">Pricing</a>
+                    <a href="index.html">Book Now</a>
+                    <a href="../index.html#contact">Contact</a>
+                </nav>
+                <div class="cta-buttons" id="header-buttons">
+                    <a href="#login" class="btn btn-secondary" id="login-btn">Login</a>
+                    <a href="#register" class="btn btn-primary" id="register-btn">Sign Up</a>
+                </div>
+                <button class="mobile-menu-toggle" id="mobile-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="booking-main">
+        
+        <!-- Login Section -->
+        <section id="login-section" class="auth-section">
+            <div class="container">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <h2 class="auth-title">Welcome Back</h2>
+                        <p class="auth-subtitle">Login to your account</p>
+                        <form id="login-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="login-email">Email Address</label>
+                                <input type="email" id="login-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" required placeholder="••••••••">
+                            </div>
+                            <div id="login-error" class="error-message"></div>
+                            <button type="submit" class="btn btn-primary btn-full btn-lg">Login</button>
+                        </form>
+                        <p class="auth-switch">Don't have an account? <a href="#register" id="show-register">Sign up here</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Register Section -->
+        <section id="register-section" class="auth-section" style="display: none;">
+            <div class="container">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <h2 class="auth-title">Create Account</h2>
+                        <p class="auth-subtitle">Join Nomad Connect today</p>
+                        <form id="register-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="register-name">Full Name</label>
+                                <input type="text" id="register-name" required placeholder="Juan Dela Cruz">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">Email Address</label>
+                                <input type="email" id="register-email" required placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-phone">Phone Number</label>
+                                <input type="tel" id="register-phone" required placeholder="+63 XXX XXX XXXX">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-address">Complete Address</label>
+                                <textarea id="register-address" required placeholder="Street, Barangay, City, Province" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">Password</label>
+                                <input type="password" id="register-password" required placeholder="••••••••" minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-confirm-password">Confirm Password</label>
+                                <input type="password" id="register-confirm-password" required placeholder="••••••••" minlength="6">
+                            </div>
+                            <div id="register-error" class="error-message"></div>
+                            <div id="register-success" class="success-message"></div>
+                            <button type="submit" class="btn btn-primary btn-full btn-lg">Create Account</button>
+                        </form>
+                        <p class="auth-switch">Already have an account? <a href="#login" id="show-login">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="dashboard-section" style="display: none;">
+            <div class="container">
+                <div class="dashboard-header">
+                    <div>
+                        <h2 class="section-title">My Dashboard</h2>
+                        <p class="user-welcome">Welcome back, <span id="user-name"></span>!</p>
+                    </div>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+
+                <!-- Booking Calendar -->
+                <div class="booking-section">
+                    <h3 class="subsection-title">Book Your Starlink Rental</h3>
+                    
+                    <div class="booking-grid">
+                        <!-- Calendar -->
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <button id="prev-month" class="calendar-nav">‹</button>
+                                <h4 id="calendar-month-year"></h4>
+                                <button id="next-month" class="calendar-nav">›</button>
+                            </div>
+                            <div class="calendar-legend">
+                                <span class="legend-item"><span class="legend-box available"></span> Available</span>
+                                <span class="legend-item"><span class="legend-box booked"></span> Booked</span>
+                                <span class="legend-item"><span class="legend-box selected"></span> Selected</span>
+                            </div>
+                            <div id="calendar" class="calendar-grid"></div>
+                        </div>
+
+                        <!-- Booking Form -->
+                        <div class="booking-form-container">
+                            <h4>Rental Details</h4>
+                            <form id="booking-form" class="booking-form">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="text" id="start-date" readonly required placeholder="Select from calendar">
+                                </div>
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="text" id="end-date" readonly required placeholder="Select from calendar">
+                                </div>
+                                <div class="form-group">
+                                    <label>Rental Plan</label>
+                                    <select id="plan-type" required>
+                                        <option value="daily">Daily - ₱1,500/day</option>
+                                        <option value="weekly">Weekly - ₱8,500/week</option>
+                                        <option value="monthly">Monthly - ₱28,000/month</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Additional Notes (Optional)</label>
+                                    <textarea id="booking-notes" rows="3" placeholder="Special requests, delivery instructions, etc."></textarea>
+                                </div>
+                                <div class="booking-summary">
+                                    <div class="summary-row">
+                                        <span>Duration:</span>
+                                        <span id="booking-duration">0 days</span>
+                                    </div>
+                                    <div class="summary-row total">
+                                        <span>Total Price:</span>
+                                        <span id="booking-total">₱0</span>
+                                    </div>
+                                </div>
+                                <div id="booking-error" class="error-message"></div>
+                                <div id="booking-success" class="success-message"></div>
+                                <button type="submit" class="btn btn-primary btn-full btn-lg">Submit Booking Request</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Bookings -->
+                <div class="my-bookings-section">
+                    <h3 class="subsection-title">My Bookings</h3>
+                    <div class="bookings-tabs">
+                        <button class="tab-btn active" data-tab="all">All Bookings</button>
+                        <button class="tab-btn" data-tab="pending">Pending</button>
+                        <button class="tab-btn" data-tab="approved">Approved</button>
+                        <button class="tab-btn" data-tab="rejected">Rejected</button>
+                    </div>
+                    <div id="bookings-list" class="bookings-list">
+                        <!-- Bookings will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="../images/logo.png" alt="Nomad Connect" class="logo-image">
+                        <div class="logo-text">
+                            <span class="logo-title">NOMAD CONNECT</span>
+                            <span class="logo-subtitle">Starlink Rentals</span>
+                        </div>
+                    </div>
+                    <p>Bringing satellite internet connectivity to every corner of the Philippines.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="../index.html">Home</a>
+                    <a href="../index.html#about">About Us</a>
+                    <a href="../index.html#pricing">Pricing</a>
+                    <a href="index.html">Book Now</a>
+                    <a href="../admin/index.html">Admin</a>
+                </div>
+                <div class="footer-contact">
+                    <h4>Get in Touch</h4>
+                    <p>📧 hello@nomadconnect.ph</p>
+                    <p>📱 +63 XXX XXX XXXX</p>
+                    <p>📍 Metro Manila, Philippines</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nomad Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Environment Config from Vercel API -->
+    <script src="/api/env.js"></script>
+    <script src="js/booking.js"></script>
+</body>
+</html>
