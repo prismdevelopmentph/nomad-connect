@@ -219,6 +219,10 @@ function initializeCalendar() {
         calendar.destroy();
     }
     
+    // Get today's date at midnight for accurate comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         headerToolbar: {
@@ -229,7 +233,7 @@ function initializeCalendar() {
         selectable: false,
         selectMirror: false,
         validRange: {
-            start: new Date().toISOString().split('T')[0]
+            start: today.toISOString().split('T')[0]
         },
         
         dateClick: function(info) {
@@ -239,19 +243,24 @@ function initializeCalendar() {
             console.log('🚫 Blocked dates:', blockedDates);
             console.log('❓ Is blocked?', blockedDates.includes(clickedDate));
             
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (new Date(clickedDate) < today) {
+            // Check if date is in the past
+            const clickedDateObj = new Date(clickedDate);
+            clickedDateObj.setHours(0, 0, 0, 0);
+            
+            if (clickedDateObj < today) {
                 alert('Cannot select past dates.');
                 return;
             }
             
+            // Check if date is blocked
             if (blockedDates.includes(clickedDate)) {
                 alert('This date is already booked. Please choose another date.');
                 return;
             }
             
+            // Handle date selection logic
             if (!selectedStartDate) {
+                // Select start date
                 selectedStartDate = clickedDate;
                 selectedEndDate = null;
                 isSelectingDates = true;
@@ -267,11 +276,13 @@ function initializeCalendar() {
             }
             
             if (selectedStartDate && !selectedEndDate && isSelectingDates) {
+                // Select end date
                 if (clickedDate < selectedStartDate) {
                     alert('End date must be on or after the start date. Please choose a later date.');
                     return;
                 }
                 
+                // Check if any dates in range are blocked
                 const selectedDates = getDatesInRange(selectedStartDate, clickedDate);
                 const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
                 
@@ -301,6 +312,7 @@ function initializeCalendar() {
                 return;
             }
             
+            // Reset selection
             if (selectedStartDate && selectedEndDate && !isSelectingDates) {
                 selectedStartDate = clickedDate;
                 selectedEndDate = null;
@@ -318,24 +330,39 @@ function initializeCalendar() {
         },
         
         dayCellDidMount: function(info) {
-            // Get date in YYYY-MM-DD format, accounting for timezone
-            const date = new Date(info.date);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
+            // FIXED: Properly format date to match blocked dates format (YYYY-MM-DD)
+            const cellDate = new Date(info.date);
+            
+            // Adjust for timezone to get accurate local date
+            const localDate = new Date(cellDate.getTime() - cellDate.getTimezoneOffset() * 60000);
+            const dateStr = localDate.toISOString().split('T')[0];
             
             console.log('📅 Rendering cell:', dateStr, 'Blocked?', blockedDates.includes(dateStr));
             
-            if (blockedDates.includes(dateStr)) {
-                info.el.classList.add('blocked');
-                console.log('🔴 Added blocked class to:', dateStr);
-            }
-            else if (info.date < new Date().setHours(0, 0, 0, 0)) {
+            // Remove any existing color classes first
+            info.el.classList.remove('available', 'blocked', 'fc-day-past');
+            
+            // Get today at midnight for comparison
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            
+            const cellDateMidnight = new Date(cellDate);
+            cellDateMidnight.setHours(0, 0, 0, 0);
+            
+            // Check if date is in the past
+            if (cellDateMidnight < todayMidnight) {
                 info.el.classList.add('fc-day-past');
+                console.log('⏮️ Past date:', dateStr);
             }
+            // Check if date is blocked
+            else if (blockedDates.includes(dateStr)) {
+                info.el.classList.add('blocked');
+                console.log('🔴 Blocked date:', dateStr);
+            }
+            // Otherwise it's available
             else {
                 info.el.classList.add('available');
+                console.log('🟢 Available date:', dateStr);
             }
         }
     });

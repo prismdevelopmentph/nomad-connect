@@ -704,49 +704,113 @@ body {
 
 #booking-calendar .fc-daygrid-day {
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 #booking-calendar .fc-daygrid-day:hover {
-    background: rgba(79, 163, 154, 0.1);
+    background: rgba(79, 163, 154, 0.15) !important;
 }
 
+/* Past dates - light gray */
 #booking-calendar .fc-day-past {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-/* Available dates - green */
-#booking-calendar .fc-daygrid-day.available {
-    background: rgba(76, 175, 80, 0.1);
-}
-
-/* Blocked dates - red */
-#booking-calendar .fc-daygrid-day.blocked {
-    background: rgba(244, 67, 54, 0.15);
+    background: rgba(0, 0, 0, 0.03) !important;
     cursor: not-allowed !important;
 }
 
-/* Selected dates - teal */
-#booking-calendar .fc-daygrid-day.selected {
-    background: var(--primary-teal) !important;
-    color: white;
+#booking-calendar .fc-day-past:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
 }
 
-#booking-calendar .fc-daygrid-day.selected .fc-daygrid-day-number {
-    color: white;
+/* Available dates - light green with border */
+#booking-calendar .fc-daygrid-day.available {
+    background: rgba(76, 175, 80, 0.12) !important;
+    border: 1px solid rgba(76, 175, 80, 0.3) !important;
+}
+
+#booking-calendar .fc-daygrid-day.available:hover {
+    background: rgba(76, 175, 80, 0.25) !important;
+    border-color: rgba(76, 175, 80, 0.5) !important;
+}
+
+/* Blocked dates - light red with border */
+#booking-calendar .fc-daygrid-day.blocked {
+    background: rgba(244, 67, 54, 0.15) !important;
+    border: 1px solid rgba(244, 67, 54, 0.3) !important;
+    cursor: not-allowed !important;
+    position: relative;
+}
+
+#booking-calendar .fc-daygrid-day.blocked:hover {
+    background: rgba(244, 67, 54, 0.2) !important;
+}
+
+/* Add an X icon to blocked dates */
+#booking-calendar .fc-daygrid-day.blocked::after {
+    content: '✖';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: var(--danger);
+    font-size: 10px;
     font-weight: bold;
 }
 
+/* Selected dates - teal background */
+#booking-calendar .fc-daygrid-day.selected {
+    background: var(--primary-teal) !important;
+    color: white !important;
+    border: 2px solid var(--dark-teal) !important;
+}
+
+#booking-calendar .fc-daygrid-day.selected .fc-daygrid-day-number {
+    color: white !important;
+    font-weight: bold;
+}
+
+#booking-calendar .fc-daygrid-day.selected .fc-daygrid-day-top {
+    color: white !important;
+}
+
+/* Today's date - highlight */
 #booking-calendar .fc-day-today {
-    background: rgba(79, 163, 154, 0.05) !important;
+    background: rgba(79, 163, 154, 0.08) !important;
 }
 
 #booking-calendar .fc-day-today .fc-daygrid-day-number {
     background: var(--primary-teal);
     color: white;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
+}
+
+/* Make day numbers more visible */
+#booking-calendar .fc-daygrid-day-number {
+    padding: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Cell content alignment */
+#booking-calendar .fc-daygrid-day-top {
+    justify-content: center;
+}
+
+/* Ensure borders between cells */
+#booking-calendar .fc-scrollgrid {
+    border: 1px solid var(--sand) !important;
+}
+
+#booking-calendar td {
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Weekend styling (optional) */
+#booking-calendar .fc-day-sat,
+#booking-calendar .fc-day-sun {
+    background: rgba(0, 0, 0, 0.01);
 }
