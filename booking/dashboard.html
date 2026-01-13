@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Nomad Connect</title>
+    <link rel="icon" type="image/png" href="../images/logo.png">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Flatpickr for date picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../images/logo.png" alt="Nomad Connect" class="logo-img">
+                <div>
+                    <h2>Nomad Connect</h2>
+                    <span>Customer Dashboard</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="user-name" class="user-name"></span>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1>Welcome back, <span id="welcome-name"></span>!</h1>
+                <p>Manage your Starlink bookings and create new reservations</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button id="new-booking-btn" class="btn btn-primary btn-lg">
+                    📅 Create New Booking
+                </button>
+            </div>
+
+            <!-- My Bookings Section -->
+            <div class="bookings-section">
+                <h2>My Bookings</h2>
+                <div id="bookings-container" class="bookings-grid">
+                    <!-- Bookings will be loaded here -->
+                </div>
+                <div id="loading-bookings" class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading your bookings...</p>
+                </div>
+                <div id="no-bookings" class="empty-state" style="display: none;">
+                    <div class="empty-icon">📭</div>
+                    <h3>No bookings yet</h3>
+                    <p>Start by creating your first Starlink rental booking!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Booking Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-modal">&times;</span>
+            <h2>Create New Booking</h2>
+            
+            <form id="booking-form">
+                <!-- Step 1: Plan Selection -->
+                <div class="form-section">
+                    <h3>Select Your Plan</h3>
+                    <div class="plan-selector">
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="daily" data-price="1500" required>
+                            <div class="plan-card">
+                                <div class="plan-icon">📅</div>
+                                <h4>Daily</h4>
+                                <p class="plan-price">₱1,500/day</p>
+                                <p class="plan-desc">Perfect for short trips</p>
+                            </div>
+                        </label>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="weekly" data-price="8500" required>
+                            <div class="plan-card featured">
+                                <div class="plan-badge">Best Value</div>
+                                <div class="plan-icon">📆</div>
+                                <h4>Weekly</h4>
+                                <p class="plan-price">₱8,500/week</p>
+                                <p class="plan-desc">Ideal for getaways</p>
+                            </div>
+                        </label>
+                        <label class="plan-option">
+                            <input type="radio" name="plan" value="monthly" data-price="28000" required>
+                            <div class="plan-card">
+                                <div class="plan-icon">📋</div>
+                                <h4>Monthly</h4>
+                                <p class="plan-price">₱28,000/month</p>
+                                <p class="plan-desc">Long-term solution</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 2: Date Selection -->
+                <div class="form-section">
+                    <h3>Select Dates</h3>
+                    <div class="date-inputs">
+                        <div class="form-group">
+                            <label for="start-date">Start Date</label>
+                            <input type="text" id="start-date" placeholder="Select start date" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date">End Date</label>
+                            <input type="text" id="end-date" placeholder="Select end date" required readonly>
+                        </div>
+                    </div>
+                    <p class="date-note">Select available dates for your rental period</p>
+                </div>
+
+                <!-- Step 3: Delivery Details -->
+                <div class="form-section">
+                    <h3>Delivery Details</h3>
+                    <div class="form-group">
+                        <label for="delivery-address">Delivery Address</label>
+                        <textarea id="delivery-address" rows="3" required placeholder="Complete delivery address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="special-requests">Special Requests (Optional)</label>
+                        <textarea id="special-requests" rows="2" placeholder="Any special instructions or requirements"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 4: Payment -->
+                <div class="form-section">
+                    <h3>Payment Method</h3>
+                    <div class="payment-selector">
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="gcash" required>
+                            <div class="payment-card">
+                                <div class="payment-icon">💳</div>
+                                <h4>GCash</h4>
+                                <p>Pay via GCash</p>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment" value="direct" required>
+                            <div class="payment-card">
+                                <div class="payment-icon">💵</div>
+                                <h4>Direct Payment</h4>
+                                <p>Cash on delivery</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- GCash Payment Proof Upload -->
+                    <div id="gcash-upload-section" class="upload-section" style="display: none;">
+                        <div class="gcash-instructions">
+                            <h4>GCash Payment Instructions:</h4>
+                            <ol>
+                                <li>Send payment to: <strong>0912-XXX-XXXX</strong></li>
+                                <li>Use reference: <strong>NC-[Your Name]</strong></li>
+                                <li>Upload screenshot below</li>
+                            </ol>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment-proof">Upload Payment Proof</label>
+                            <input type="file" id="payment-proof" accept="image/*" required>
+                            <p class="file-note">Upload screenshot of your GCash payment</p>
+                        </div>
+                        <div id="image-preview"></div>
+                    </div>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="price-summary">
+                    <h3>Booking Summary</h3>
+                    <div class="summary-row">
+                        <span>Plan:</span>
+                        <span id="summary-plan">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Duration:</span>
+                        <span id="summary-duration">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Dates:</span>
+                        <span id="summary-dates">-</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="summary-total">₱0</span>
+                    </div>
+                </div>
+
+                <div id="form-error" class="error-message"></div>
+                <button type="submit" class="btn btn-primary btn-full">Submit Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Detail Modal -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Booking Details</h2>
+            <div id="booking-detail-content"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
