@@ -278,6 +278,14 @@ function initializeCalendar() {
         dateClick: function(info) {
             const clickedDate = info.dateStr;
             
+            // Prevent selecting past dates
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (new Date(clickedDate) < today) {
+                alert('Cannot select past dates.');
+                return;
+            }
+            
             // Check if date is blocked
             if (blockedDates.includes(clickedDate)) {
                 alert('This date is already booked. Please choose another date.');
@@ -291,33 +299,50 @@ function initializeCalendar() {
                 document.getElementById('start-date').value = clickedDate;
                 document.getElementById('end-date').value = '';
                 document.getElementById('calendar-note').textContent = 
-                    'Now select your end date';
+                    'Now click on your end date';
+                
+                updateCalendarSelection();
+                updateSummary();
             }
             // If start date exists but no end date
             else if (selectedStartDate && !selectedEndDate) {
-                // Ensure end date is after start date
+                // Ensure end date is after or equal to start date
                 if (clickedDate < selectedStartDate) {
-                    alert('End date must be after start date.');
-                    return;
+                    // Swap dates - make clicked date the new start
+                    selectedEndDate = selectedStartDate;
+                    selectedStartDate = clickedDate;
+                    document.getElementById('start-date').value = clickedDate;
+                    document.getElementById('end-date').value = selectedEndDate;
+                } else {
+                    // Normal case - clicked date becomes end date
+                    selectedEndDate = clickedDate;
+                    document.getElementById('end-date').value = clickedDate;
                 }
                 
                 // Check if range has blocked dates
-                const selectedDates = getDatesInRange(selectedStartDate, clickedDate);
+                const selectedDates = getDatesInRange(selectedStartDate, selectedEndDate);
                 const hasBlockedDate = selectedDates.some(date => blockedDates.includes(date));
                 
                 if (hasBlockedDate) {
                     alert('One or more dates in this range are already booked. Please choose different dates.');
+                    // Reset selection
+                    selectedStartDate = null;
+                    selectedEndDate = null;
+                    document.getElementById('start-date').value = '';
+                    document.getElementById('end-date').value = '';
+                    document.getElementById('calendar-note').textContent = 
+                        'Click on the calendar to select your rental dates';
+                    updateCalendarSelection();
+                    updateSummary();
                     return;
                 }
                 
-                selectedEndDate = clickedDate;
-                document.getElementById('end-date').value = clickedDate;
                 document.getElementById('calendar-note').textContent = 
-                    `Selected: ${formatDate(selectedStartDate)} to ${formatDate(clickedDate)}`;
+                    `Selected: ${formatDate(selectedStartDate)} to ${formatDate(selectedEndDate)}`;
+                
+                updateCalendarSelection();
+                updateSummary();
             }
-            
-            updateCalendarSelection();
-            updateSummary();
         },
         
         // Style dates
