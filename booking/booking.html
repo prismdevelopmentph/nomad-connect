@@ -235,13 +235,14 @@
             </div>
         </div>
     </footer>
-
-    <!-- Supabase -->
+    <!-- 1. External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <!-- Environment Config from Vercel API -->
-    <script src="/api/env.js"></script>
+    
+    <!-- 2. Environment Config (if using Vercel) -->
+    <script src="/api/env.js" onerror="console.log('ENV file not found, using hardcoded values')"></script>
+    
+    <!-- 3. Application Script -->
     <script src="js/booking.js"></script>
 </body>
 </html>

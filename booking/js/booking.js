@@ -1,16 +1,23 @@
-// Supabase Configuration
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Wait for ENV to load, then initialize
+let supabase, EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_USER, EMAILJS_TEMPLATE_ADMIN;
 
-// EmailJS Configuration
-const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_USER = 'YOUR_USER_TEMPLATE_ID';
-const EMAILJS_TEMPLATE_ADMIN = 'YOUR_ADMIN_TEMPLATE_ID';
+function initializeServices() {
+    // Supabase Configuration (use ENV if available, otherwise hardcoded)
+    const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+    const SUPABASE_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Initialize EmailJS
-emailjs.init(EMAILJS_PUBLIC_KEY);
+    // EmailJS Configuration
+    EMAILJS_PUBLIC_KEY = window.ENV?.EMAILJS_PUBLIC_KEY || 'YOUR_EMAILJS_PUBLIC_KEY';
+    EMAILJS_SERVICE_ID = window.ENV?.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
+    EMAILJS_TEMPLATE_USER = window.ENV?.EMAILJS_TEMPLATE_USER || 'YOUR_USER_TEMPLATE_ID';
+    EMAILJS_TEMPLATE_ADMIN = window.ENV?.EMAILJS_TEMPLATE_ADMIN || 'YOUR_ADMIN_TEMPLATE_ID';
+
+    // Initialize EmailJS
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
+}
 
 // Global state
 let currentUser = null;
@@ -29,9 +36,13 @@ const pricing = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    checkUserSession();
-    setupEventListeners();
-    checkUrlHash(); // Check if user came from a specific link
+    // Wait a bit for env.js to load, then initialize
+    setTimeout(() => {
+        initializeServices();
+        checkUserSession();
+        setupEventListeners();
+        checkUrlHash(); // Check if user came from a specific link
+    }, 100);
 });
 
 // Check URL hash for direct navigation
