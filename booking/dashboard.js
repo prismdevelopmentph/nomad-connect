@@ -561,7 +561,7 @@ async function handleBookingSubmit(e) {
         alert('Booking submitted successfully! We will review and confirm your booking shortly.\n\nReminder: Remaining balance, security deposit, and valid ID required upon pickup/delivery.');
         
         setTimeout(() => {
-            window.open('https://facebook.com/YOUR_PAGE_HERE', '_blank');
+            window.open('https://www.facebook.com/inkspirestudio.mnl', '_blank');
         }, 1000);
         
         loadBookings();
