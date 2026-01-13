@@ -1,0 +1,126 @@
+<!-- booking/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Nomad Connect</title>
+    <link rel="icon" type="image/png" href="../images/logo.png">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <div class="logo-section">
+                <img src="../images/logo.png" alt="Nomad Connect" class="logo-img">
+                <h1>Admin Panel</h1>
+                <p>Nomad Connect - Starlink Rentals</p>
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="admin@nomadconnect.ph">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="dashboard-container" style="display: none;">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="../images/logo.png" alt="Nomad Connect" class="logo-img-small">
+                    <div>
+                        <h2>Nomad Connect</h2>
+                        <span>Admin Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span id="admin-email" class="admin-name"></span>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon pending">📋</div>
+                <div class="stat-content">
+                    <h3 id="stat-pending">0</h3>
+                    <p>Pending Bookings</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon confirmed">✅</div>
+                <div class="stat-content">
+                    <h3 id="stat-confirmed">0</h3>
+                    <p>Confirmed Bookings</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon total">📊</div>
+                <div class="stat-content">
+                    <h3 id="stat-total">0</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">💰</div>
+                <div class="stat-content">
+                    <h3 id="stat-revenue">₱0</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <h3>Bookings Management</h3>
+            <div class="filters">
+                <button class="filter-btn active" data-status="all">All Bookings</button>
+                <button class="filter-btn" data-status="pending">Pending</button>
+                <button class="filter-btn" data-status="confirmed">Confirmed</button>
+                <button class="filter-btn" data-status="rejected">Rejected</button>
+            </div>
+            <button id="refresh-btn" class="btn btn-outline">🔄 Refresh</button>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="table-section">
+            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading bookings...</p>
+            </div>
+            <div id="bookings-table-container">
+                <!-- Table will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Detail Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Booking Details</h2>
+            <div id="booking-details"></div>
+            <div class="modal-actions">
+                <button id="confirm-booking-btn" class="btn btn-success">✓ Confirm Booking</button>
+                <button id="reject-booking-btn" class="btn btn-danger">✗ Reject Booking</button>
+                <button class="btn btn-secondary close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
